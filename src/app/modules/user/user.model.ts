@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { TUser } from "./user.interface";
+
 const userSchema = new Schema<TUser>(
   {
     fullName: { type: String, required: [true, "Full name is required"] },
@@ -44,6 +45,12 @@ const pendingUserSchema = new Schema<TUser>(
     email: { type: String, required: [true, "Email is required"] },
     phone: { type: String, required: [true, "Phone number is required"] },
     password: { type: String, required: [true, "Password is required"] },
+    licenceUrl: { type: String },
+    barAssociation: { type: String },
+    licenceNumber: { type: String },
+    experience: { type: Number },
+    serviceType: { type: String },
+    specialization: { type: [String], default: [] },
     role: {
       type: String,
       default: "User",

@@ -1,8 +1,7 @@
 import { Types } from "mongoose";
 
 export type TUserRole = "Admin" | "User" | "Lawyer";
-export type TServiceType = "Criminal" | "Civil" | "Corporate" | "Other"; // example — adjust as needed
-
+export type TServiceType = "Online" | "In_Person" | "Both"; 
 export type TUser = {
   _id?: Types.ObjectId;
   fullName: string;

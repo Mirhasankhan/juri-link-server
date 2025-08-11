@@ -32,6 +32,11 @@ export default {
     gen_salt: process.env.GEN_SALT,
     expires_in: process.env.EXPIRES_IN,
   },
+   cloudinary: {
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+  },
   stripe: {
     stripe_secret: process.env.STRIPE_SK,
     webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,

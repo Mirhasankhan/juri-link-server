@@ -8,8 +8,16 @@ import sendEmail from "../../utils/email";
 import { emailBody } from "../../middleware/EmailBody";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import config from "../../config";
+import Stripe from "stripe";
+import { createCustomerStripeAccount } from "../../helpers/createStripeAccount";
+import { FileUploadHelper } from "../../helpers/filUploadHelper";
+import { Request } from "express";
+import { IUploadFile } from "../../interface/file";
 
-const createPendingUserIntoDB = async (payload: TUser) => {
+const stripe = new Stripe(config.stripe.stripe_secret as string);
+
+const createPendingUserIntoDB = async (req: Request) => {
+  const payload = req.body;
   const existingUser = await User.findOne({ email: payload.email });
   if (existingUser) {
     throw new AppError(409, "Email already exists!");
@@ -20,6 +28,13 @@ const createPendingUserIntoDB = async (payload: TUser) => {
   const expiresAt = Date.now() + OTP_EXPIRATION_TIME;
   const subject = "Your Account Verification OTP";
   const html = emailBody(payload.fullName, otp);
+
+  const files = req.files as IUploadFile[] | undefined;
+
+  if (files && files.length > 0) {
+    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
+    payload.licenceUrl = uploadedMedia[0].secure_url;
+  }
 
   await sendEmail(payload.email, subject, html);
   await PendingUser.findOneAndUpdate(
@@ -77,6 +92,39 @@ const createUserIntoDB = async (email: string, otp: string) => {
     await PendingUser.deleteOne({ email: userPending.email });
     throw new AppError(410, "OTP has expired");
   }
+  let stripeUserId: string | null = null;
+  let accountLinkData = null;
+
+  if (userPending.role === "User") {
+    const stripeAccount = await createCustomerStripeAccount(
+      userPending.email,
+      userPending.fullName
+    );
+    stripeUserId = stripeAccount.id;
+  }
+
+  if (userPending.role === "Lawyer") {
+    const account = await stripe.accounts.create({
+      type: "express",
+      capabilities: {
+        transfers: { requested: true },
+      },
+    });
+
+    stripeUserId = account.id;
+
+    accountLinkData = await stripe.accountLinks.create({
+      account: account.id,
+      refresh_url: "https://yourdomain.com/reauth",
+      return_url:
+        "https://eze-ifenna-backend.vercel.app/account/connect/success",
+      type: "account_onboarding",
+    });
+  }
+
+  if (!stripeUserId) {
+    throw new AppError(404, "Stripe acccount creation failed");
+  }
 
   await PendingUser.deleteOne({ email });
 
@@ -85,6 +133,12 @@ const createUserIntoDB = async (email: string, otp: string) => {
     password: userPending.password,
     fullName,
     phoneNumber: userPending.phone,
+    stripeUserId,
+    licenceNumber: userPending.licenceNumber,
+    licenceUrl: userPending.licenceUrl,
+    specialization: userPending.specialization,
+    serviceType: userPending.serviceType,
+    experience: userPending.experience,
     role: userPending.role,
   });
 
@@ -104,6 +158,7 @@ const createUserIntoDB = async (email: string, otp: string) => {
   return {
     accessToken,
     userInfo: sanitizedUser,
+    accountLink: accountLinkData?.url,
   };
 };
 
