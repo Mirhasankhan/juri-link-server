@@ -6,6 +6,9 @@ import sendEmail from "../../utils/email";
 import generateOTP from "../../utils/generateOtp";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import { emailBodyOtp } from "../../middleware/EmailBody";
+import { IUploadFile } from "../../interface/file";
+import { FileUploadHelper } from "../../helpers/filUploadHelper";
+import { Request } from "express";
 
 const loginUserIntoDB = async (payload: any) => {
   const user = await User.findOne({ email: payload.email });
@@ -24,13 +27,12 @@ const loginUserIntoDB = async (payload: any) => {
       id: user._id,
       email: user.email,
       role: user.role,
-      fullName: user.fullName,    
+      fullName: user.fullName,
     },
     config.jwt.jwt_secret as string,
     config.jwt.expires_in as string
   );
   const userObj = user.toObject();
-
   const { password, ...userInfo } = userObj;
 
   return {
@@ -116,9 +118,34 @@ const resetPasswordIntoDB = async (newPassword: string, userId: string) => {
   return;
 };
 
+const updateUserDetailsIntoDB = async (req: Request) => {
+  const payload = req.body;
+  const userId = req.user.id;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  const files = req.files as IUploadFile[] | undefined;
+
+  if (files && files.length > 0) {
+    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
+    payload.profileImage = uploadedMedia[0].secure_url;
+  }
+ 
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $set: payload },
+    { new: true, runValidators: true }
+  );
+
+  return updatedUser;
+};
 export const authServices = {
   loginUserIntoDB,
   sendForgotPasswordOtpDB,
   verifyForgotPasswordOtpCode,
   resetPasswordIntoDB,
+  updateUserDetailsIntoDB
 };

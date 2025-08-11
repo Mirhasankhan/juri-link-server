@@ -47,10 +47,21 @@ const resetPassword = catchAsync(async (req, res) => {
     message: "password reset successfully",
   });
 });
+const updateUser = catchAsync(async (req, res) => {
+  const result = await authServices.updateUserDetailsIntoDB(req);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "user details successfully",
+    data:result
+  });
+});
 
 export const authController = {
   loginUser,
   sendOtp,
   verifyOtp,
   resetPassword,
+  updateUser
 };

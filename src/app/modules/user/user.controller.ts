@@ -32,9 +32,7 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
-
-const userInfo = catchAsync(async (req, res) => {
-  
+const userInfo = catchAsync(async (req, res) => {  
   const user = await userService.getProfileDetailsFromDb(req.user.id);
   sendResponse(res, {
     success: true,
