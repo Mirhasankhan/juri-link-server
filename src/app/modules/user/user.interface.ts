@@ -15,6 +15,8 @@ export type TUser = {
   barAssociation?: string;
   licenceNumber?: string;
   experience?: number;
+  avgRating: number;
+  totalReview: number;
   serviceType?: TServiceType;
   specialization: string[];
   otp: string;

@@ -1,8 +1,6 @@
 import AppError from "../../utils/AppError";
 import { PendingUser, User } from "./user.model";
 import bcrypt from "bcrypt";
-import { TUser } from "./user.interface";
-
 import generateOTP from "../../utils/generateOtp";
 import sendEmail from "../../utils/email";
 import { emailBody } from "../../middleware/EmailBody";
@@ -153,7 +151,7 @@ const createUserIntoDB = async (email: string, otp: string) => {
   );
   const userObj = user.toObject();
 
-  const { password, ...sanitizedUser } = userObj;
+  const { password,_id,specialization,address,barAssociation,licenceNumber,licenceUrl,totalReview,avgRating, ...sanitizedUser } = userObj;
 
   return {
     accessToken,
@@ -180,7 +178,6 @@ const getProfileDetailsFromDb = async (userId: string) => {
 export const userService = {
   createPendingUserIntoDB,
   createUserIntoDB,
-
   resendVerifyOTP,
   getProfileDetailsFromDb,
 };

@@ -22,6 +22,8 @@ const userSchema = new Schema<TUser>(
     licenceUrl: { type: String },
     barAssociation: { type: String },
     licenceNumber: { type: String },
+    avgRating: { type: Number, default: 0 },
+    totalReview: { type: Number, default: 0 },
     experience: { type: Number },
     serviceType: { type: String },
     specialization: { type: [String], default: [] },
