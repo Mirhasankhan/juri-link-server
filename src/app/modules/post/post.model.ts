@@ -1,15 +1,13 @@
 import { Schema, model, Types } from "mongoose";
 
-interface TPost {
+export interface TPost {
   title: string;
-  category: string;
   description: string;
   budget: string;
   location: string;
   urgencyLevel: "Low" | "Medium" | "High";
-  user: Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+  userId: Types.ObjectId;
+  serviceId: Types.ObjectId;
 }
 
 const postSchema = new Schema<TPost>(
@@ -18,10 +16,6 @@ const postSchema = new Schema<TPost>(
       type: String,
       required: [true, "Title is required"],
       trim: true,
-    },
-    category: {
-      type: String,
-      required: [true, "Category is required"],
     },
     description: {
       type: String,
@@ -40,9 +34,14 @@ const postSchema = new Schema<TPost>(
       enum: ["Low", "Medium", "High"],
       required: [true, "Urgency level is required"],
     },
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    serviceId: {
+      type: Schema.Types.ObjectId,
+      ref: "LegalService",
       required: true,
     },
   },
