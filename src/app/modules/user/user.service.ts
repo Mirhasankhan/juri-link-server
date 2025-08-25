@@ -151,7 +151,18 @@ const createUserIntoDB = async (email: string, otp: string) => {
   );
   const userObj = user.toObject();
 
-  const { password,_id,specialization,address,barAssociation,licenceNumber,licenceUrl,totalReview,avgRating, ...sanitizedUser } = userObj;
+  const {
+    password,
+    _id,
+    specialization,
+    address,
+    barAssociation,
+    licenceNumber,
+    licenceUrl,
+    totalReview,
+    avgRating,
+    ...sanitizedUser
+  } = userObj;
 
   return {
     accessToken,
@@ -175,9 +186,33 @@ const getProfileDetailsFromDb = async (userId: string) => {
   };
 };
 
+const getAllUsersFromDB = async (
+  rating?: number,
+  type?: string,
+  specializationId?: string
+) => {
+  const filter: any = { role: "Lawyer" };
+
+  if (rating) {
+    filter.avgRating = { $gte: rating };
+  }
+
+  if (type) {
+    filter.serviceType = type;
+  }
+
+  if (specializationId) {
+    filter.specialization = specializationId;
+  }
+
+  const users = await User.find(filter);
+  return users;
+};
+
 export const userService = {
   createPendingUserIntoDB,
   createUserIntoDB,
   resendVerifyOTP,
   getProfileDetailsFromDb,
+  getAllUsersFromDB,
 };

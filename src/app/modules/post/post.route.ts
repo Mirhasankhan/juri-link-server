@@ -12,5 +12,6 @@ router.post(
   validateRequest(PostValidationSchema),
   postController.createPost
 );
+router.get("/", postController.allPosts);
 
 export const postRoutes = router;

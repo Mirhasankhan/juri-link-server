@@ -22,8 +22,8 @@ const resendOtp = catchAsync(async (req, res) => {
 });
 
 const createUser = catchAsync(async (req, res) => {
-  const {email,otp} =req.body
-  const user = await userService.createUserIntoDB(email,otp);
+  const { email, otp } = req.body;
+  const user = await userService.createUserIntoDB(email, otp);
   sendResponse(res, {
     success: true,
     statusCode: 200,
@@ -32,8 +32,25 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
-const userInfo = catchAsync(async (req, res) => {  
+const userInfo = catchAsync(async (req, res) => {
   const user = await userService.getProfileDetailsFromDb(req.user.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Userinfo retrived successfull",
+    data: user,
+  });
+});
+const allUsers = catchAsync(async (req, res) => {
+  const rating = parseInt(req.query.rating as string);
+  const type = req.query.type as string;
+  const specializationId = req.query.specializationId as string;
+
+  const user = await userService.getAllUsersFromDB(
+    rating,
+    type,
+    specializationId
+  );
   sendResponse(res, {
     success: true,
     statusCode: 201,
@@ -44,7 +61,8 @@ const userInfo = catchAsync(async (req, res) => {
 
 export const userController = {
   createPendingUser,
-  createUser,  
+  createUser,
   userInfo,
-  resendOtp
+  resendOtp,
+  allUsers,
 };
