@@ -1,6 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 
-interface TBooking {
+export interface TBooking {
   userId: Types.ObjectId;
   lawyerId: Types.ObjectId;
   serviceId: Types.ObjectId;
@@ -11,10 +11,12 @@ interface TBooking {
     | "Completed"
     | "Paid"
     | "Cancelled"
+    | "RefundRequest"
     | "Refunded";
   time: string;
   date: Date;
   serviceDescription: string;
+  refundReason?: string;
 }
 
 const BookingSchema = new Schema<TBooking>(
@@ -39,13 +41,16 @@ const BookingSchema = new Schema<TBooking>(
         "Completed",
         "Cancelled",
         "Paid",
-        "Refunded"
+        "Refunded",
+        "RefundRequest",
       ],
+      default: "Pending",
       required: true,
     },
     time: { type: String, required: true },
     date: { type: Date, required: true },
     serviceDescription: { type: String, required: true },
+    refundReason: { type: String },
   },
   {
     timestamps: true,
