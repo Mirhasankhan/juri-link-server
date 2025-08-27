@@ -188,6 +188,7 @@ const getProfileDetailsFromDb = async (userId: string) => {
 
 const getAllUsersFromDB = async (
   rating?: number,
+  experience?: number,
   type?: string,
   specializationId?: string
 ) => {
@@ -195,6 +196,9 @@ const getAllUsersFromDB = async (
 
   if (rating) {
     filter.avgRating = { $gte: rating };
+  }
+  if (experience) {
+    filter.experience = { $gte: experience };
   }
 
   if (type) {

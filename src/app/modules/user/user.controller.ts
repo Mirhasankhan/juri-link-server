@@ -37,24 +37,26 @@ const userInfo = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: 201,
-    message: "Userinfo retrived successfull",
+    message: "Userinfo retrieved successfull",
     data: user,
   });
 });
 const allUsers = catchAsync(async (req, res) => {
   const rating = parseInt(req.query.rating as string);
+  const experience = parseInt(req.query.experience as string);
   const type = req.query.type as string;
   const specializationId = req.query.specializationId as string;
 
   const user = await userService.getAllUsersFromDB(
     rating,
+    experience,
     type,
     specializationId
   );
   sendResponse(res, {
     success: true,
     statusCode: 201,
-    message: "Userinfo retrived successfull",
+    message: "Userinfo retrieved successfull",
     data: user,
   });
 });
