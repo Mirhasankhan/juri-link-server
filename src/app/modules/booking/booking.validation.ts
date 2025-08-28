@@ -15,7 +15,7 @@ export const bookingValidationSchema = z.object({
   date: z.coerce.date({ invalid_type_error: "Invalid date format" }),
   serviceDescription: z
     .string()
-    .min(5, "Description must be at least 5 characters"),
+    .min(5, "Description must be at least 5 characters")
 });
 
 
