@@ -41,6 +41,17 @@ const userInfo = catchAsync(async (req, res) => {
     data: user,
   });
 });
+const getLawyerDetails = catchAsync(async (req, res) => {
+  const lawyer = await userService.getLawyerDetailsFromDb(req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Lawyer details retrieved successfully",
+    data: lawyer,
+  });
+});
+
+
 const allUsers = catchAsync(async (req, res) => {
   const rating = parseInt(req.query.rating as string);
   const experience = parseInt(req.query.experience as string);
@@ -65,6 +76,7 @@ export const userController = {
   createPendingUser,
   createUser,
   userInfo,
+  getLawyerDetails,
   resendOtp,
   allUsers,
 };

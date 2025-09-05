@@ -11,6 +11,8 @@ import { createCustomerStripeAccount } from "../../helpers/createStripeAccount";
 import { FileUploadHelper } from "../../helpers/filUploadHelper";
 import { Request } from "express";
 import { IUploadFile } from "../../interface/file";
+import { Review } from "../review/review.model";
+import { LegalService } from "../legalServices/legalService.model";
 
 const stripe = new Stripe(config.stripe.stripe_secret as string);
 
@@ -186,6 +188,39 @@ const getProfileDetailsFromDb = async (userId: string) => {
   };
 };
 
+
+const getLawyerDetailsFromDb = async (lawyerId: string) => {
+  const lawyer = await User.findOne({
+    _id: lawyerId,
+    role: "Lawyer",
+  }).lean();
+
+  if (!lawyer) {
+    throw new AppError(404, "Lawyer not found");
+  }
+
+ 
+  const specializations = await LegalService.find(
+    { _id: { $in: lawyer.specialization } },
+    "serviceName"
+  ).lean();
+
+  const reviews = await Review.find({ userId: lawyerId })
+    .populate("userId", "name email")
+    .lean();
+
+  const { password, ...sanitizedUser } = lawyer;
+
+  return {
+    lawyer: {
+      ...sanitizedUser,
+      specialization: specializations.map(s => s.serviceName),
+    },
+    reviews,
+  };
+};
+
+
 const getAllUsersFromDB = async (
   rating?: number,
   experience?: number,
@@ -219,4 +254,5 @@ export const userService = {
   resendVerifyOTP,
   getProfileDetailsFromDb,
   getAllUsersFromDB,
+  getLawyerDetailsFromDb
 };

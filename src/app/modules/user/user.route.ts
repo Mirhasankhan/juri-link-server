@@ -18,6 +18,7 @@ router.post(
 router.post("/resend-otp", userController.resendOtp);
 router.post("/verify", userController.createUser);
 router.get("/profile", auth(), userController.userInfo);
+router.get("/details/:id",  userController.getLawyerDetails);
 router.get("/all", userController.allUsers);
 
 export const userRoute = router;
