@@ -4,6 +4,7 @@ import { userRoute } from "../modules/user/user.route";
 import { legalServiceRoutes } from "../modules/legalServices/legalService.route";
 import { postRoutes } from "../modules/post/post.route";
 import { bookingRoutes } from "../modules/booking/booking.route";
+import { subscriptionPlanRoutes } from "../modules/subscription/subscription.route";
 
 const router = Router();
 const moduleRoutes = [
@@ -26,6 +27,10 @@ const moduleRoutes = [
   {
     path: "/booking",
     route: bookingRoutes,
+  },
+  {
+    path: "/subscription-plan",
+    route: subscriptionPlanRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
