@@ -16,6 +16,7 @@ export type TUser = {
   barAssociation?: string;
   licenceNumber?: string;
   experience?: number;
+  fee?: number;
   avgRating: number;
   totalReview: number;
   serviceType?: TServiceType;

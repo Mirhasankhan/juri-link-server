@@ -139,6 +139,7 @@ const createUserIntoDB = async (email: string, otp: string) => {
     specialization: userPending.specialization,
     serviceType: userPending.serviceType,
     experience: userPending.experience,
+    fee: userPending.fee,
     role: userPending.role,
   });
 
@@ -188,7 +189,6 @@ const getProfileDetailsFromDb = async (userId: string) => {
   };
 };
 
-
 const getLawyerDetailsFromDb = async (lawyerId: string) => {
   const lawyer = await User.findOne({
     _id: lawyerId,
@@ -199,7 +199,6 @@ const getLawyerDetailsFromDb = async (lawyerId: string) => {
     throw new AppError(404, "Lawyer not found");
   }
 
- 
   const specializations = await LegalService.find(
     { _id: { $in: lawyer.specialization } },
     "serviceName"
@@ -214,12 +213,11 @@ const getLawyerDetailsFromDb = async (lawyerId: string) => {
   return {
     lawyer: {
       ...sanitizedUser,
-      specialization: specializations.map(s => s.serviceName),
+      specialization: specializations.map((s) => s.serviceName),
     },
     reviews,
   };
 };
-
 
 const getAllUsersFromDB = async (
   rating?: number,
@@ -229,24 +227,88 @@ const getAllUsersFromDB = async (
 ) => {
   const filter: any = { role: "Lawyer" };
 
-  if (rating) {
-    filter.avgRating = { $gte: rating };
-  }
-  if (experience) {
-    filter.experience = { $gte: experience };
-  }
+  if (rating) filter.avgRating = { $gte: rating };
+  if (experience) filter.experience = { $gte: experience };
+  if (type) filter.serviceType = type;
+  if (specializationId) filter.specialization = specializationId;
 
-  if (type) {
-    filter.serviceType = type;
-  }
+  const users = await User.aggregate([
+    { $match: filter },
+    {
+      $lookup: {
+        from: "legalservices",
+        let: { specializationIds: "$specialization" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $in: [
+                  "$_id",
+                  {
+                    $map: {
+                      input: "$$specializationIds",
+                      as: "specId",
+                      in: {
+                        $convert: {
+                          input: "$$specId",
+                          to: "objectId",
+                          onError: null,
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          { $project: { serviceName: 1 } },
+        ],
+        as: "legalServices",
+      },
+    },
+    {
+      $project: {
+        fullName: 1,
+        email: 1,
+        avgRating: 1,
+        fee: 1,
+        experience: 1,
+        serviceType: 1,
+        specialization: 1,
+        legalServices: 1,
+      },
+    },
+  ]);
 
-  if (specializationId) {
-    filter.specialization = specializationId;
-  }
-
-  const users = await User.find(filter);
   return users;
 };
+
+// const getAllUsersFromDB = async (
+//   rating?: number,
+//   experience?: number,
+//   type?: string,
+//   specializationId?: string
+// ) => {
+//   const filter: any = { role: "Lawyer" };
+
+//   if (rating) {
+//     filter.avgRating = { $gte: rating };
+//   }
+//   if (experience) {
+//     filter.experience = { $gte: experience };
+//   }
+
+//   if (type) {
+//     filter.serviceType = type;
+//   }
+
+//   if (specializationId) {
+//     filter.specialization = specializationId;
+//   }
+
+//   const users = await User.find(filter);
+//   return users;
+// };
 
 export const userService = {
   createPendingUserIntoDB,
@@ -254,5 +316,5 @@ export const userService = {
   resendVerifyOTP,
   getProfileDetailsFromDb,
   getAllUsersFromDB,
-  getLawyerDetailsFromDb
+  getLawyerDetailsFromDb,
 };

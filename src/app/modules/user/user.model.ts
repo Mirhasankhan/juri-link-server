@@ -25,6 +25,7 @@ const userSchema = new Schema<TUser>(
     avgRating: { type: Number, default: 0 },
     totalReview: { type: Number, default: 0 },
     experience: { type: Number },
+    fee: { type: Number },
     serviceType: { type: String },
     specialization: { type: [String], default: [] },
     role: {
@@ -51,6 +52,7 @@ const pendingUserSchema = new Schema<TUser>(
     barAssociation: { type: String },
     licenceNumber: { type: String },
     experience: { type: Number },
+    fee: { type: Number },
     serviceType: { type: String },
     specialization: { type: [String], default: [] },
     role: {
