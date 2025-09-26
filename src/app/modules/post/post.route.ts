@@ -13,5 +13,17 @@ router.post(
   postController.createPost
 );
 router.get("/", postController.allPosts);
+router.get("/:id", postController.postDetails);
+router.patch("/:id", auth(), postController.likeUnlikePost);
+router.post(
+  "/comment/create",
+  auth(),
+  postController.createComment
+);
+router.post(
+  "/reply/create",
+  auth(),
+  postController.createReply
+);
 
 export const postRoutes = router;

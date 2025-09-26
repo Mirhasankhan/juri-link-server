@@ -26,8 +26,55 @@ const allPosts = catchAsync(async (req, res) => {
     data: posts,
   });
 });
+const postDetails = catchAsync(async (req, res) => {
+  const id = req.params.id;
+
+  const post = await postServices.getPostDetailsFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Post retrieved successfully",
+    data: post,
+  });
+});
+const likeUnlikePost = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const postId = req.params.id;
+
+  const post = await postServices.handleLikeUnlikePostIntoDB(userId, postId);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: `${post.message}`,
+  });
+});
+
+const createComment = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const payload = req.body;
+  await postServices.createCommentIntoDB(userId, payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Comment submitted successfully",
+  });
+});
+const createReply = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const payload = req.body;
+  await postServices.createReplyIntoDB(userId, payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Reply submitted successfully",
+  });
+});
 
 export const postController = {
   createPost,
   allPosts,
+  postDetails,
+  likeUnlikePost,
+  createComment,
+  createReply,
 };
