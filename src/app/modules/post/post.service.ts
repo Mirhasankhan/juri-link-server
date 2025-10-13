@@ -9,12 +9,12 @@ const createPostIntoDB = async (userId: string, payload: TPost) => {
   if (!existingUser) {
     throw new AppError(404, "user not found");
   }
-  const post = await Post.create({
+  await Post.create({
     ...payload,
     userId,
   });
 
-  return post;
+  return;
 };
 
 const getAllPostsFromDB = async (
@@ -41,7 +41,8 @@ const getAllPostsFromDB = async (
   }
 
   const posts = await Post.find(filter)
-    .populate("userId", "fullName profileImage")
+    .populate("serviceId", "serviceName -_id")
+    .populate("userId", "fullName profileImage -_id")
     .populate({
       path: "comments",
       populate: [
@@ -114,7 +115,7 @@ const deletePostFromDB = async (postId: string) => {
   }
 
   await Post.deleteOne({ _id: postId });
-  return
+  return;
 };
 
 const createCommentIntoDB = async (userId: string, payload: TComment) => {

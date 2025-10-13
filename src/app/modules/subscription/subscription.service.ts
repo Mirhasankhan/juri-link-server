@@ -131,7 +131,6 @@ const createCheckoutSession = async (priceId: string, userId: string) => {
   }
 };
 
-
 export const subscriptionPlanServices = {
   createSubscriptionPlanIntoDB,
   createCheckoutSession,

@@ -26,6 +26,11 @@ const postSchema = new Schema<TPost>(
       enum: ["Low", "Medium", "High"],
       required: [true, "Urgency level is required"],
     },
+    serviceType: {
+      type: String,
+      enum: ["Online", "In_Person", "Both"],
+      required: [true, "Service type is required"],
+    },
     status: {
       type: String,
       enum: ["Active", "Flagged", "Deleted"],

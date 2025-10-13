@@ -8,6 +8,7 @@ export interface TPost {
   status: "Active" | "Flagged" | "Deleted";
   urgencyLevel: "Low" | "Medium" | "High";
   userId: Types.ObjectId;
+   serviceType: { type: String },
   serviceId: Types.ObjectId;
   likedUsers: Types.ObjectId[];
 }

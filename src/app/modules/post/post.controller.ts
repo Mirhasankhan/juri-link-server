@@ -5,12 +5,12 @@ import { postServices } from "./post.service";
 const createPost = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const payload = req.body;
-  const service = await postServices.createPostIntoDB(userId, payload);
+  await postServices.createPostIntoDB(userId, payload);
   sendResponse(res, {
     success: true,
     statusCode: 201,
-    message: "Post successfully",
-    data: service,
+    message: "Post submitted successfully",
+   
   });
 });
 const allPosts = catchAsync(async (req, res) => {
