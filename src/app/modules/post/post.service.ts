@@ -45,13 +45,7 @@ const getAllPostsFromDB = async (
     .populate("userId", "fullName profileImage -_id")
     .populate({
       path: "comments",
-      populate: [
-        { path: "userId", select: "fullName profileImage" },
-        {
-          path: "replies",
-          populate: { path: "userId", select: "fullName profileImage" },
-        },
-      ],
+      select: "_id -postId",
     });
 
   return posts;
