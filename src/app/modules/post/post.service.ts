@@ -53,6 +53,7 @@ const getAllPostsFromDB = async (
 
 const getPostDetailsFromDB = async (postId: string) => {
   const post = await Post.findOne({ _id: postId })
+    .select("likedUsers") 
     .populate("userId", "fullName profileImage")
     .populate({
       path: "comments",
@@ -68,8 +69,10 @@ const getPostDetailsFromDB = async (postId: string) => {
   if (!post) {
     throw new AppError(404, "post not found");
   }
+
   return post;
 };
+
 
 const handleLikeUnlikePostIntoDB = async (userId: string, postId: string) => {
   const user = await User.findById(userId);
