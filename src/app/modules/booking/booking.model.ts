@@ -15,6 +15,8 @@ export interface TBooking {
     | "Refunded";
   time: string;
   date: Date;
+  paymentMethodId: string;
+  paymentIntentId: string;
   serviceDescription: string;
   refundReason?: string;
 }
@@ -30,7 +32,7 @@ const BookingSchema = new Schema<TBooking>(
     },
     serviceType: {
       type: String,
-      enum: ["Online", "In_Person", "Both"],
+      enum: ["Online", "In_Person"],
       required: true,
     },
     status: {
@@ -48,6 +50,8 @@ const BookingSchema = new Schema<TBooking>(
       required: true,
     },
     time: { type: String, required: true },
+    paymentMethodId: { type: String, required: true },
+    paymentIntentId: { type: String, required: true },
     date: { type: Date, required: true },
     serviceDescription: { type: String, required: true },
     refundReason: { type: String },

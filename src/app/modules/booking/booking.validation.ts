@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const ServiceTypeEnum = z.enum(["Online", "In_Person", "Both"]);
+const ServiceTypeEnum = z.enum(["Online", "In_Person"]);
 
 export const bookingValidationSchema = z.object({
   lawyerId: z.string().min(1, "Lawyer ID is required"),
