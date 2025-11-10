@@ -23,6 +23,8 @@ const userSchema = new Schema<TUser>(
     barAssociation: { type: String },
     licenceNumber: { type: String },
     avgRating: { type: Number, default: 0 },
+    allTimeEarning: { type: Number, default: 0 },
+    currentEarning: { type: Number, default: 0 },
     totalReview: { type: Number, default: 0 },
     experience: { type: Number },
     fee: { type: Number },

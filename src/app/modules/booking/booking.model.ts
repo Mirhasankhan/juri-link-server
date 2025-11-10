@@ -9,7 +9,6 @@ export interface TBooking {
     | "Pending"
     | "Confirmed"
     | "Completed"
-    | "Paid"
     | "Cancelled"
     | "RefundRequest"
     | "Refunded";
@@ -18,6 +17,7 @@ export interface TBooking {
   paymentMethodId: string;
   paymentIntentId: string;
   serviceDescription: string;
+  fee: Number;
   refundReason?: string;
 }
 
@@ -42,7 +42,6 @@ const BookingSchema = new Schema<TBooking>(
         "Confirmed",
         "Completed",
         "Cancelled",
-        "Paid",
         "Refunded",
         "RefundRequest",
       ],
@@ -54,6 +53,7 @@ const BookingSchema = new Schema<TBooking>(
     paymentIntentId: { type: String, required: true },
     date: { type: Date, required: true },
     serviceDescription: { type: String, required: true },
+    fee: { type: Number, required: true },
     refundReason: { type: String },
   },
   {

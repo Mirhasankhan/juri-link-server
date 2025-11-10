@@ -12,5 +12,6 @@ router.post(
   validateRequest(bookingValidationSchema),
   bookingController.createBooking
 );
+router.post("/mark-completed/:id", auth(), bookingController.markCompleted);
 
 export const bookingRoutes = router;

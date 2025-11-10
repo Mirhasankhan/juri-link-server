@@ -1,7 +1,9 @@
 import config from "../../config";
+import { Earning } from "../earning/earning.model";
 import { User } from "../user/user.model";
 import { Booking, TBooking } from "./booking.model";
 import Stripe from "stripe";
+import mongoose from "mongoose";
 
 const stripe = new Stripe(config.stripe.stripe_secret as string);
 
@@ -43,6 +45,7 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
     const newBooking = await Booking.create({
       ...payload,
       paymentIntentId: paymentIntent.id,
+      fee: existingLawyer.fee,
       paymentMethodId: payload.paymentMethodId,
       userId,
     });
@@ -52,6 +55,56 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
   }
 };
 
+
+
+const markBookingAsCompletedInDB = async (bookingId: string) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const booking = await Booking.findById(bookingId).session(session);
+    if (!booking) throw new Error("Booking not found");
+ 
+    await Earning.create(
+      [
+        {
+          lawyerId: booking.lawyerId,
+          bookingId: booking._id,
+          amount: booking.fee,
+        },
+      ],
+      { session }
+    );
+
+    await Booking.updateOne(
+      { _id: booking._id },
+      { status: "Completed" },
+      { session }
+    );
+
+    await User.updateOne(
+      { _id: booking.lawyerId },
+      {
+        $inc: {
+          allTimeEarning: booking.fee,
+          currentEarning: booking.fee,
+        },
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+    return
+  } catch (err) {
+    await session.abortTransaction();
+    throw err;
+  } finally {
+    session.endSession();
+  }
+};
+
+
 export const bookingServices = {
   createBookingIntoDb,
+  markBookingAsCompletedInDB
 };

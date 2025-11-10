@@ -13,7 +13,18 @@ const createBooking = catchAsync(async (req, res) => {
     data: booking,
   });
 });
+const markCompleted = catchAsync(async (req, res) => {
+  const bookingId = req.params.id;
+
+  await bookingServices.markBookingAsCompletedInDB(bookingId);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Booking marked as completed successfully",
+  });
+});
 
 export const bookingController = {
-    createBooking
-}
+  createBooking,
+  markCompleted
+};

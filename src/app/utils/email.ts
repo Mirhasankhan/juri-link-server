@@ -19,7 +19,7 @@ const sendEmail = async (
 
   // Email options
   const mailOptions = {
-    from: config.emailSender.email,
+    from: `"Juri Link" <${config.emailSender.email}>`,
     to,
     subject,
     html,
