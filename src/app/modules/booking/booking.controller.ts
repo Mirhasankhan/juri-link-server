@@ -13,6 +13,16 @@ const createBooking = catchAsync(async (req, res) => {
     data: booking,
   });
 });
+const userWiseBookings = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const bookings = await bookingServices.getUserWiseBookingsFromDB(userId);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Bookings retrieved successfully",
+    data: bookings,
+  });
+});
 const markCompleted = catchAsync(async (req, res) => {
   const bookingId = req.params.id;
 
@@ -26,5 +36,6 @@ const markCompleted = catchAsync(async (req, res) => {
 
 export const bookingController = {
   createBooking,
-  markCompleted
+  markCompleted,
+  userWiseBookings
 };

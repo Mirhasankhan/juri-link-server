@@ -55,7 +55,28 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
   }
 };
 
+const getUserWiseBookingsFromDB = async (userId: string) => {
+  const existingUser = await User.findById(userId).select("fullName profileImage");
+  if (!existingUser) {
+    throw new Error("User not found");
+  }
 
+  const bookings = await Booking.find({ userId })
+    .select("time date fee serviceType status serviceId lawyerId")
+    .populate({
+      path: "serviceId",
+      select: "serviceName", 
+    })
+    .populate({
+      path: "lawyerId",
+      select: "fullName profileImage",
+      model: "User",
+    });
+
+  return {
+    bookings,
+  };
+};
 
 const markBookingAsCompletedInDB = async (bookingId: string) => {
   const session = await mongoose.startSession();
@@ -64,7 +85,7 @@ const markBookingAsCompletedInDB = async (bookingId: string) => {
   try {
     const booking = await Booking.findById(bookingId).session(session);
     if (!booking) throw new Error("Booking not found");
- 
+
     await Earning.create(
       [
         {
@@ -94,7 +115,7 @@ const markBookingAsCompletedInDB = async (bookingId: string) => {
     );
 
     await session.commitTransaction();
-    return
+    return;
   } catch (err) {
     await session.abortTransaction();
     throw err;
@@ -103,8 +124,8 @@ const markBookingAsCompletedInDB = async (bookingId: string) => {
   }
 };
 
-
 export const bookingServices = {
   createBookingIntoDb,
-  markBookingAsCompletedInDB
+  markBookingAsCompletedInDB,
+  getUserWiseBookingsFromDB
 };

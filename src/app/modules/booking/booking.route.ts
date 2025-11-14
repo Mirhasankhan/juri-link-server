@@ -13,5 +13,6 @@ router.post(
   bookingController.createBooking
 );
 router.post("/mark-completed/:id", auth(), bookingController.markCompleted);
+router.get("/user-wise", auth("User"), bookingController.userWiseBookings);
 
 export const bookingRoutes = router;

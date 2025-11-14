@@ -213,7 +213,7 @@ const getLawyerDetailsFromDb = async (lawyerId: string) => {
   return {
     lawyer: {
       ...sanitizedUser,
-      specialization: specializations.map((s) => s.serviceName),
+      specialization: specializations
     },
     reviews,
   };
