@@ -19,21 +19,16 @@ const createPostIntoDB = async (userId: string, payload: TPost) => {
 
 const getAllPostsFromDB = async (
   serviceId?: string,
-  search?: string,
+  serviceType?: string,
   level?: string
 ) => {
   const filter: any = {};
 
-  if (search) {
-    filter.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { location: { $regex: search, $options: "i" } },
-      { description: { $regex: search, $options: "i" } },
-    ];
-  }
-
   if (serviceId) {
     filter.serviceId = serviceId;
+  }
+  if (serviceType) {
+    filter.serviceType = serviceType;
   }
 
   if (level) {
@@ -53,7 +48,7 @@ const getAllPostsFromDB = async (
 
 const getPostDetailsFromDB = async (postId: string) => {
   const post = await Post.findOne({ _id: postId })
-    .select("likedUsers") 
+    .select("likedUsers")
     .populate("userId", "fullName profileImage")
     .populate({
       path: "comments",
@@ -72,7 +67,6 @@ const getPostDetailsFromDB = async (postId: string) => {
 
   return post;
 };
-
 
 const handleLikeUnlikePostIntoDB = async (userId: string, postId: string) => {
   const user = await User.findById(userId);

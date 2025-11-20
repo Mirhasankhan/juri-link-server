@@ -23,6 +23,16 @@ const userWiseBookings = catchAsync(async (req, res) => {
     data: bookings,
   });
 });
+const lawyerWiseBookings = catchAsync(async (req, res) => {
+  const lawyerId = req.user.id;
+  const bookings = await bookingServices.getLawyerWiseBookingsFromDB(lawyerId);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Bookings retrieved successfully",
+    data: bookings,
+  });
+});
 const markCompleted = catchAsync(async (req, res) => {
   const bookingId = req.params.id;
 
@@ -37,5 +47,6 @@ const markCompleted = catchAsync(async (req, res) => {
 export const bookingController = {
   createBooking,
   markCompleted,
-  userWiseBookings
+  userWiseBookings,
+  lawyerWiseBookings
 };

@@ -77,6 +77,28 @@ const getUserWiseBookingsFromDB = async (userId: string) => {
     bookings,
   };
 };
+const getLawyerWiseBookingsFromDB = async (lawyerId: string) => {
+  const existingLawyer = await User.findById(lawyerId).select("fullName profileImage");
+  if (!existingLawyer) {
+    throw new Error("lawyer not found");
+  }
+
+  const bookings = await Booking.find({ lawyerId })
+    .select("time date fee serviceType status serviceId userId")
+    .populate({
+      path: "serviceId",
+      select: "serviceName", 
+    })
+    .populate({
+      path: "userId",
+      select: "fullName profileImage",
+      model: "User",
+    });
+
+  return {
+    bookings,
+  };
+};
 
 const markBookingAsCompletedInDB = async (bookingId: string) => {
   const session = await mongoose.startSession();
@@ -127,5 +149,6 @@ const markBookingAsCompletedInDB = async (bookingId: string) => {
 export const bookingServices = {
   createBookingIntoDb,
   markBookingAsCompletedInDB,
-  getUserWiseBookingsFromDB
+  getUserWiseBookingsFromDB,
+  getLawyerWiseBookingsFromDB
 };

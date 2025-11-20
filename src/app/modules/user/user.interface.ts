@@ -11,9 +11,10 @@ export type TUser = {
   stripeUserId: string;
   profileImage?: string;
   phone?: string;
-  address?: string;
+  about?: string;
+  institute?: string;
+  location?: string;
   licenceUrl?: string;
-  barAssociation?: string;
   licenceNumber?: string;
   currentEarning: Number;
   allTimeEarning: Number;

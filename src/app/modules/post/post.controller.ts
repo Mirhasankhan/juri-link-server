@@ -15,10 +15,10 @@ const createPost = catchAsync(async (req, res) => {
 });
 const allPosts = catchAsync(async (req, res) => {
   const serviceId = req.query.serviceId as string;
-  const search = req.query.search as string;
+  const serviceType = req.query.serviceType as string;
   const level = req.query.level as string;
 
-  const posts = await postServices.getAllPostsFromDB(serviceId, search, level);
+  const posts = await postServices.getAllPostsFromDB(serviceId, serviceType, level);
   sendResponse(res, {
     success: true,
     statusCode: 201,

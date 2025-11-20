@@ -14,5 +14,6 @@ router.post(
 );
 router.post("/mark-completed/:id", auth(), bookingController.markCompleted);
 router.get("/user-wise", auth("User"), bookingController.userWiseBookings);
+router.get("/lawyer-wise", auth("Lawyer"), bookingController.lawyerWiseBookings);
 
 export const bookingRoutes = router;
