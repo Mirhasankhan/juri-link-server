@@ -20,6 +20,7 @@ export type TUser = {
   allTimeEarning: Number;
   experience?: number;
   fee?: number;
+  availabilitySetup?: boolean;
   avgRating: number;
   totalReview: number;
   serviceType?: TServiceType;

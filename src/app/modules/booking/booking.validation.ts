@@ -12,5 +12,17 @@ export const bookingValidationSchema = z.object({
     .string()
     .min(5, "Description must be at least 5 characters"),
 });
+export const cancelValidationSchema = z.object({
+  bookingId: z.string().min(1, "Booking ID is required"),
+  cancelReason: z
+    .string()
+    .min(10, "Cancellation reason must be 10 characters long"),
+});
+export const refundRequestSchema = z.object({
+  bookingId: z.string().min(1, "Booking ID is required"),
+  refundReason: z
+    .string()
+    .min(10, "Refund request reason must be 10 characters long"),
+});
 
 export type BookingValidationType = z.infer<typeof bookingValidationSchema>;

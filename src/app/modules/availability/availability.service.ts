@@ -4,6 +4,7 @@ import { isOverlap } from "../../utils/isOverlap";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { User } from "../user/user.model";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(customParseFormat);
@@ -40,6 +41,11 @@ const createUserAvailability = async (
     await availabilityDoc.save();
 
     created.push(availabilityDoc);
+
+    await User.updateOne(
+      { _id: lawyerId },
+      { $set: { availabilitySetup: true } }
+    );
   }
 
   return created;

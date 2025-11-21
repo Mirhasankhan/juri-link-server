@@ -5,20 +5,17 @@ export interface TBooking {
   lawyerId: Types.ObjectId;
   serviceId: Types.ObjectId;
   serviceType: "Online" | "In_Person" | "Both";
-  status:
-    | "Pending"
-    | "Confirmed"
-    | "Completed"
-    | "Cancelled"
-    | "RefundRequest"
-    | "Refunded";
+  status: "Active" | "Completed" | "Cancelled" | "RefundRequest" | "Refunded";
   time: string;
   date: Date;
   paymentMethodId: string;
   paymentIntentId: string;
   serviceDescription: string;
   fee: Number;
+  startUrl?: string;
+  joinUrl?: string;
   refundReason?: string;
+  cancelReason?: string;
 }
 
 const BookingSchema = new Schema<TBooking>(
@@ -37,15 +34,8 @@ const BookingSchema = new Schema<TBooking>(
     },
     status: {
       type: String,
-      enum: [
-        "Pending",
-        "Confirmed",
-        "Completed",
-        "Cancelled",
-        "Refunded",
-        "RefundRequest",
-      ],
-      default: "Pending",
+      enum: ["Active", "Completed", "Cancelled", "Refunded", "RefundRequest"],
+      default: "Active",
       required: true,
     },
     time: { type: String, required: true },
@@ -55,6 +45,9 @@ const BookingSchema = new Schema<TBooking>(
     serviceDescription: { type: String, required: true },
     fee: { type: Number, required: true },
     refundReason: { type: String },
+    startUrl: { type: String },
+    joinUrl: { type: String },
+    cancelReason: { type: String },
   },
   {
     timestamps: true,

@@ -43,10 +43,32 @@ const markCompleted = catchAsync(async (req, res) => {
     message: "Booking marked as completed successfully",
   });
 });
+const cancelBooking = catchAsync(async (req, res) => {
+  const payload = req.body
+
+  await bookingServices.cancelBookingFromDB(payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Booking cancelled and fee refunded",
+  });
+});
+const refundRequest = catchAsync(async (req, res) => {
+  const payload = req.body
+
+  await bookingServices.sendRefundRequestIntoDB(payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Refund request send to admin",
+  });
+});
 
 export const bookingController = {
   createBooking,
   markCompleted,
   userWiseBookings,
+  cancelBooking,
+  refundRequest,
   lawyerWiseBookings
 };
