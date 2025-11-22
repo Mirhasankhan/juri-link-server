@@ -21,6 +21,7 @@ export type TUser = {
   experience?: number;
   fee?: number;
   availabilitySetup?: boolean;
+  isSubscribed: boolean;
   avgRating: number;
   totalReview: number;
   serviceType?: TServiceType;

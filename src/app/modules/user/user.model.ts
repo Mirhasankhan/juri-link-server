@@ -28,6 +28,7 @@ const userSchema = new Schema<TUser>(
     currentEarning: { type: Number, default: 0 },
     totalReview: { type: Number, default: 0 },
     availabilitySetup: { type: Boolean, default: false },
+    isSubscribed: { type: Boolean, default: false },
     experience: { type: Number },
     fee: { type: Number },
     serviceType: { type: String },

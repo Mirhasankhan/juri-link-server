@@ -9,16 +9,13 @@ import { User } from "../user/user.model";
 const stripe = new Stripe(config.stripe.stripe_secret as string);
 
 const createSubscriptionPlanIntoDB = async (req: Request) => {
-  const { name, amount, interval, subscriptionTitleType, features } = req.body;
+  const { name, amount, interval, features, type } = req.body;
 
   const existingSubscription = await Subscription.findOne({
-    subscriptionTitleType,
+    type,
   });
   if (existingSubscription) {
-    throw new AppError(
-      400,
-      `Subscription with title '${subscriptionTitleType}' already exists`
-    );
+    throw new AppError(400, `${type} subscription already exists`);
   }
 
   let product;
@@ -29,11 +26,12 @@ const createSubscriptionPlanIntoDB = async (req: Request) => {
   }
 
   let price;
+  
   try {
     price = await stripe.prices.create({
       unit_amount: Number(amount) * 100,
       currency: "usd",
-      recurring: { interval },
+      recurring: { interval, interval_count: type == "Quarterly" ? 3 : 1 },
       product: product.id,
     });
   } catch (error: any) {
@@ -42,15 +40,32 @@ const createSubscriptionPlanIntoDB = async (req: Request) => {
 
   const newSubscription = await Subscription.create({
     title: name,
-    subscriptionTitleType,
     features,
     priceId: price.id,
     productId: product.id,
     interval: price.recurring?.interval || null,
-    type: "SUBSCRIPTION",
+    type: type,
   });
 
   return newSubscription;
+};
+
+const getSubscriptionPlansFromDB = async () => {
+  const plans = await Subscription.find();
+  const plansWithPrice = await Promise.all(
+    plans.map(async (plan) => {
+      const stripePrice = await stripe.prices.retrieve(plan.priceId);
+
+      return {
+        title: plan.title,
+        type: plan.type,
+        features: plan.features,
+        price: stripePrice.unit_amount! / 100,
+        priceId: plan.priceId
+      };
+    })
+  );
+  return plansWithPrice;
 };
 
 const createCheckoutSession = async (priceId: string, userId: string) => {
@@ -95,15 +110,18 @@ const createCheckoutSession = async (priceId: string, userId: string) => {
 
   return { url: session.url };
 };
- const handleSubscriptionCreated = async (
+const handleSubscriptionCreated = async (
   priceId: string,
   userId: string,
   subscriptionPayId: string
 ) => {
-  try {  
+  try {
     const subscription = await Subscription.findOne({ priceId });
     if (!subscription) {
-      throw new AppError(404, `Subscription with priceId: ${priceId} not found`);
+      throw new AppError(
+        404,
+        `Subscription with priceId: ${priceId} not found`
+      );
     }
 
     const result = await UserSubscription.findOneAndUpdate(
@@ -114,10 +132,10 @@ const createCheckoutSession = async (priceId: string, userId: string) => {
           userId,
           priceId,
           subscriptionId: subscription._id,
-          subscriptionTitleType: subscription.subscriptionTitleType,
+          type: subscription.type,
           subscriptionPayId,
           status: "ACTIVE",
-          // startDate: new Date(), 
+          // startDate: new Date(),
         },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -134,5 +152,6 @@ const createCheckoutSession = async (priceId: string, userId: string) => {
 export const subscriptionPlanServices = {
   createSubscriptionPlanIntoDB,
   createCheckoutSession,
-  handleSubscriptionCreated
+  handleSubscriptionCreated,
+  getSubscriptionPlansFromDB,
 };

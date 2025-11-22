@@ -1,29 +1,28 @@
 import { Schema, model, Types } from "mongoose";
-type TPaymentStatus = "ACTIVE" | "DEACTIVE";
+type TPaymentStatus = "Active" | "Deactivated";
+type TSubscriptionType = "Monthly" | "Quarterly" | "Yearly";
 
 export interface TSubscription {
   title: string;
-  subscriptionTitleType: string;
   features: string[];
   priceId: string;
   productId: string;
   interval: string | null;
-  type: "SUBSCRIPTION";
+  type: TSubscriptionType;
 }
 export interface TUserSubscription {
   userId: Types.ObjectId;
   subscriptionId: Types.ObjectId;
-  subscriptionTitleType: string;
   priceId: string;
   subscriptionPayId: string;
   features: string[];
   status: TPaymentStatus;
+  type: TSubscriptionType;
 }
 
 const SubscriptionPlanSchema = new Schema<TSubscription>(
   {
     title: { type: String, required: true },
-    subscriptionTitleType: { type: String, required: true, unique: true },
     features: {
       type: [String],
       required: true,
@@ -34,8 +33,8 @@ const SubscriptionPlanSchema = new Schema<TSubscription>(
     },
     priceId: { type: String, required: true },
     productId: { type: String, required: true },
-    interval: { type: String, default: null },
-    type: { type: String, enum: ["SUBSCRIPTION"], required: true },
+    interval: { type: String, required: true },
+    type: { type: String, enum: ["Monthly", "Quarterly", "Yearly"], required: true },
   },
   {
     timestamps: true,
@@ -58,7 +57,7 @@ const UserSubscriptionSchema = new Schema<TUserSubscription>(
       ref: "Subscription",
       required: true,
     },
-    subscriptionTitleType: { type: String, required: true },
+    type: { type: String, required: true },
     priceId: { type: String, required: true },
     subscriptionPayId: { type: String, required: true },
     features: {
@@ -69,7 +68,11 @@ const UserSubscriptionSchema = new Schema<TUserSubscription>(
         message: "Features array cannot be empty",
       },
     },
-    status: { type: String, enum: ["ACTIVE", "DEACTIVE"], default: "ACTIVE" },
+    status: {
+      type: String,
+      enum: ["Active", "Deactivated"],
+      default: "Active",
+    },
   },
   {
     timestamps: true,
