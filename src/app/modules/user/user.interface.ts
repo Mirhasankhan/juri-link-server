@@ -8,6 +8,7 @@ export type TUser = {
   fullName: string;
   email: string;
   password: string;
+  stripeAccountId: string;
   stripeUserId: string;
   profileImage?: string;
   phone?: string;

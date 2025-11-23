@@ -16,6 +16,7 @@ const userSchema = new Schema<TUser>(
     },
     password: { type: String, required: [true, "Password is required"] },
     stripeUserId: { type: String, required: true },
+    stripeAccountId: { type: String },
     profileImage: { type: String },
     phone: { type: String },
     location: { type: String },

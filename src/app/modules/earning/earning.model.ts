@@ -1,17 +1,10 @@
 import { Schema, model, Types, Document } from "mongoose";
+import { TEarning, TWithdraw } from "./earning.interface";
 
-export interface IEarning extends Document {
-  lawyerId: Types.ObjectId;
-  bookingId: Types.ObjectId;
-  amount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  lawyer?: any;
-  booking?: any;
-}
+
 
 // Mongoose schema
-const earningSchema = new Schema<IEarning>(
+const earningSchema = new Schema<TEarning>(
   {
     lawyerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     bookingId: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
@@ -23,4 +16,28 @@ const earningSchema = new Schema<IEarning>(
   }
 );
 
-export const Earning = model<IEarning>("Earning", earningSchema);
+export const Earning = model<TEarning>("Earning", earningSchema);
+
+const withdrawSchema = new Schema<TWithdraw>(
+  {
+    lawyerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    status: {
+      type: String,
+      enum: ["Pending", "Accepted", "Rejected"],
+      default: "Pending",
+    },
+  },
+  { timestamps: true }
+);
+
+export const Withdraw = model<TWithdraw>("Withdraw", withdrawSchema);
+

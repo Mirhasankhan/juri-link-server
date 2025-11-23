@@ -89,23 +89,11 @@ const createUserIntoDB = async (email: string, otp: string) => {
     await PendingUser.deleteOne({ email: userPending.email });
     throw new AppError(410, "OTP has expired");
   }
-  let stripeUserId: string | null = null; 
 
-  if (userPending.role === "User") {
-    const stripeAccount = await createCustomerStripeAccount(
-      userPending.email,
-      userPending.fullName
-    );
-    stripeUserId = stripeAccount.id;
-  }
-
-  if (userPending.role === "Lawyer") {
-    stripeUserId = "account.id";
-  }
-
-  if (!stripeUserId) {
-    throw new AppError(404, "Stripe acccount creation failed");
-  }
+  const stripeAccount = await createCustomerStripeAccount(
+    userPending.email,
+    userPending.fullName
+  );
 
   await PendingUser.deleteOne({ email });
 
@@ -114,7 +102,7 @@ const createUserIntoDB = async (email: string, otp: string) => {
     password: userPending.password,
     fullName,
     phoneNumber: userPending.phone,
-    stripeUserId,
+    stripeUserId: stripeAccount.id,
     licenceNumber: userPending.licenceNumber,
     location: userPending.location,
     licenceUrl: userPending.licenceUrl,
