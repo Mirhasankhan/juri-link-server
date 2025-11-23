@@ -6,7 +6,7 @@ import sendEmail from "../../utils/email";
 import { emailBody } from "../../middleware/EmailBody";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import config from "../../config";
-import { createCustomerStripeAccount } from "../../helpers/createStripeAccount";
+import { createCustomerStripeAccount } from "../../helpers/stripe.payment";
 import { FileUploadHelper } from "../../helpers/filUploadHelper";
 import { Request } from "express";
 import { IUploadFile } from "../../interface/file";
@@ -143,12 +143,9 @@ const createUserIntoDB = async (email: string, otp: string) => {
 };
 
 const getProfileDetailsFromDb = async (userId: string) => {
-  const user = await User.findById({
-    _id: userId,
-  });
-  if (!user) {
-    throw new AppError(404, "User not found");
-  }
+  const user = await User.findById(userId);
+  if (!user) throw new AppError(404, "User not found");
+
   const userObj = user.toObject();
   const { password, ...sanitizedUser } = userObj;
 
@@ -163,9 +160,7 @@ const getLawyerDetailsFromDb = async (lawyerId: string) => {
     role: "Lawyer",
   }).lean();
 
-  if (!lawyer) {
-    throw new AppError(404, "Lawyer not found");
-  }
+  if (!lawyer) throw new AppError(404, "Lawyer not found");
 
   const specializations = await LegalService.find(
     { _id: { $in: lawyer.specialization } },
@@ -251,33 +246,6 @@ const getAllUsersFromDB = async (
 
   return users;
 };
-
-// const getAllUsersFromDB = async (
-//   rating?: number,
-//   experience?: number,
-//   type?: string,
-//   specializationId?: string
-// ) => {
-//   const filter: any = { role: "Lawyer" };
-
-//   if (rating) {
-//     filter.avgRating = { $gte: rating };
-//   }
-//   if (experience) {
-//     filter.experience = { $gte: experience };
-//   }
-
-//   if (type) {
-//     filter.serviceType = type;
-//   }
-
-//   if (specializationId) {
-//     filter.specialization = specializationId;
-//   }
-
-//   const users = await User.find(filter);
-//   return users;
-// };
 
 export const userService = {
   createPendingUserIntoDB,

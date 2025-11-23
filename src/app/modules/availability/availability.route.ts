@@ -9,7 +9,6 @@ router.post(
   auth("Lawyer"),
   availabilityController.createAvailability
 );
-router.get("/", availabilityController.availabilityForDay);
 router.get("/expert-slots", availabilityController.getExpertDayWiseSlots);
 router.get("/all-slots", auth("Lawyer"), availabilityController.expertAllSlots);
 router.post("/create-slot", auth("Lawyer"), availabilityController.addNewSlot);

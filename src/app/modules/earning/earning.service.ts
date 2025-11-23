@@ -1,4 +1,5 @@
-import { ensureStripeAccountReady } from "../../helpers/accountChecking";
+
+import { ensureStripeAccountReady } from "../../helpers/stripe.payment";
 import AppError from "../../utils/AppError";
 import { User } from "../user/user.model";
 import { Earning, Withdraw } from "./earning.model";

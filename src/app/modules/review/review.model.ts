@@ -2,6 +2,7 @@ import { Schema, model, Types } from "mongoose";
 
 export interface TReview {
   userId: Types.ObjectId;
+  lawyerId: Types.ObjectId;
   bookingId: Types.ObjectId;
   comment: string;
   rating: number;
@@ -10,12 +11,13 @@ export interface TReview {
 const ReviewSchema = new Schema<TReview>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    lawyerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     bookingId: { type: Schema.Types.ObjectId, ref: "Booking", required: true },
     comment: { type: String, required: true },
     rating: { type: Number, required: true, min: 0, max: 5 },
   },
   {
-    timestamps: true, 
+    timestamps: true,
     versionKey: false,
   }
 );

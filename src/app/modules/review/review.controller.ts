@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { reviewServices } from "./review.service";
 
-const createBooking = catchAsync(async (req, res) => {
+const createReview = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const payload = req.body;
   const review = await reviewServices.createReviewIntoDB(userId, payload);
@@ -13,3 +13,7 @@ const createBooking = catchAsync(async (req, res) => {
     data: review,
   });
 });
+
+export const reviewController = {
+  createReview
+}

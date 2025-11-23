@@ -125,10 +125,6 @@ const updateSlotFromDB = async (slotId: string, data: any) => {
     "availability"
   );
 
-  // const allSlots = await AvailableSlotModel.find({
-  //   availabilityId: slot.availability._id,
-  // });
-
   const availabilityId = (slot as any).availability._id;
   const allSlots = await AvailableSlotModel.find({ availabilityId });
 

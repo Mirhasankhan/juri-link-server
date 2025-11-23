@@ -23,9 +23,11 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
 
     const review = await Review.create(
       [
-        {
-          ...payload,
+        {         
           userId,
+          lawyerId,
+          comment: payload.comment,
+          rating: payload.rating
         },
       ],
       { session }

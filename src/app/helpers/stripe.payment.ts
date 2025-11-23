@@ -3,8 +3,41 @@ import config from "../config";
 
 const stripe = new Stripe(config.stripe.stripe_secret as string);
 
-export const ensureStripeAccountReady = async (lawyer: any) => {
+export const createCustomerStripeAccount = async (
+  email: string,
+  name: string
+) => {
+  const account = await stripe.customers.create({
+    email,
+    name,
+  });
+  return account;
+};
 
+export const createStripeOneTimePaymentIntent = async (
+  paymentMethodId: string,
+  stripeUserId: string,
+  fee: number
+) => {
+  await stripe.paymentMethods.attach(paymentMethodId as string, {
+    customer: stripeUserId as string,
+  });
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: fee * 100,
+    currency: "usd",
+    customer: stripeUserId,
+    confirm: true,
+    payment_method: paymentMethodId as string,
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: "never",
+    },
+  });
+  return paymentIntent;
+};
+
+export const ensureStripeAccountReady = async (lawyer: any) => {
   if (!lawyer.stripeAccountId) {
     const account = await stripe.accounts.create({
       type: "express",
@@ -25,7 +58,6 @@ export const ensureStripeAccountReady = async (lawyer: any) => {
 
   return null;
 };
-
 
 const generateOnboardingLink = async (accountId: string) => {
   const link = await stripe.accountLinks.create({

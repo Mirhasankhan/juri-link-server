@@ -9,6 +9,7 @@ import {
   cancelZoomMeeting,
   createZoomMeeting,
 } from "../../helpers/zoom.helper";
+import { createStripeOneTimePaymentIntent } from "../../helpers/stripe.payment";
 
 const stripe = new Stripe(config.stripe.stripe_secret as string);
 
@@ -29,22 +30,11 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
   if (!serviceExists) {
     throw new Error("This lawyer does not provide the selected service");
   }
-
-  await stripe.paymentMethods.attach(payload.paymentMethodId as string, {
-    customer: existingUser?.stripeUserId as string,
-  });
-
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: existingLawyer.fee! * 100,
-    currency: "usd",
-    customer: existingUser?.stripeUserId,
-    confirm: true,
-    payment_method: payload.paymentMethodId as string,
-    automatic_payment_methods: {
-      enabled: true,
-      allow_redirects: "never",
-    },
-  });
+  const paymentIntent = await createStripeOneTimePaymentIntent(
+    payload.paymentMethodId,
+    existingUser.stripeUserId,
+    existingLawyer.fee!
+  );
 
   let start_url = "";
   let join_url = "";
@@ -52,13 +42,13 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
   if (paymentIntent.status === "succeeded") {
     if (payload.serviceType == "Online") {
       const response = await createZoomMeeting(
-        "Law Consultation",
+        `Law Consultation`,
         "2025-11-21T18:30:00+06:00"
       );
       start_url = response.start_url;
       join_url = response.join_url;
     }
-    console.log(start_url,join_url);
+    console.log(start_url, join_url);
     const newBooking = await Booking.create({
       ...payload,
       paymentIntentId: paymentIntent.id,
@@ -71,7 +61,7 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
 
     return newBooking;
   } else {
-    return "Something went wrong! Booking Failed";
+    throw new AppError(404, "Booking failed")
   }
 };
 

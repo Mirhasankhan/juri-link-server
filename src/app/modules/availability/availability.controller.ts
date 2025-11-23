@@ -14,15 +14,7 @@ const createAvailability = catchAsync(async (req: Request, res: Response) => {
     message: "Availability created successfully",
   });
 });
-const availabilityForDay = catchAsync(async (req: Request, res: Response) => {
-  const { lawyerId, day } = req.body;
 
-  sendResponse(res, {
-    success: true,
-    statusCode: 200,
-    message: "Availabilities retrieved successfully",
-  });
-});
 const getExpertDayWiseSlots = catchAsync(
   async (req: Request, res: Response) => {
     const lawyerId = req.query.lawyerId as string;
@@ -82,8 +74,7 @@ const deleteSlot = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const availabilityController = {
-  createAvailability,
-  availabilityForDay,
+  createAvailability,  
   updateSlot,
   expertAllSlots,
   addNewSlot,
