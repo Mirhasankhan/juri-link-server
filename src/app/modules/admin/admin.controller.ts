@@ -13,7 +13,18 @@ const adminLogin = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const createAdmin = catchAsync(async (req, res) => {
+  const payload = req.body;
+  await adminServices.createNewAdminIntoDB(payload);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Admin created successfully",
+  });
+});
 
 export const adminController = {
+  createAdmin,
   adminLogin,
 };

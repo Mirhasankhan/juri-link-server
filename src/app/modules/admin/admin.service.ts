@@ -1,8 +1,12 @@
 import config from "../../config";
+import { transferMoneyToConnectedLawyer } from "../../helpers/stripe.payment";
 import AppError from "../../utils/AppError";
 import { jwtHelpers } from "../../utils/jwtHelpers";
-import { Admin } from "./admin.model";
+import { Withdraw } from "../earning/earning.model";
+import { User } from "../user/user.model";
+import { Admin, IAdmin } from "./admin.model";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 const loginAdminFromDB = async (email: string, password: string) => {
   const admin = await Admin.findOne({ email });
@@ -30,6 +34,61 @@ const loginAdminFromDB = async (email: string, password: string) => {
   };
 };
 
+const createNewAdminIntoDB = async (payload: IAdmin) => {
+  const existingAdmin = await Admin.findOne({ email: payload.email });
+
+  if (existingAdmin) throw new AppError(409, "Admin already exists");
+
+  await Admin.create({
+    adminName: payload.adminName,
+    password: payload.password,
+    role: payload.role,
+    email: payload.email,
+  });
+  return;
+};
+
+const acceptWithdrawRequest = async (withdrawId: string) => {
+  const session = await mongoose.startSession();
+
+  return session.withTransaction(async () => {
+    const pendingWithdraw = await Withdraw.findOne(
+      { _id: withdrawId, status: "Pending" },
+      null,
+      { session }
+    );
+
+    if (!pendingWithdraw) {
+      throw new AppError(404, "Withdraw request not found");
+    }
+
+    const lawyer = await User.findById(pendingWithdraw.lawyerId, null, {
+      session,
+    });
+    if (!lawyer) {
+      throw new AppError(404, "Lawyer not found");
+    }
+    
+    const transfer = await transferMoneyToConnectedLawyer(
+      lawyer.stripeAccountId,
+      pendingWithdraw.amount
+    );
+
+    if (!transfer || transfer.reversed) {
+      throw new AppError(400, "Stripe transfer failed");
+    }
+    lawyer.currentEarning =
+      Number(lawyer.currentEarning) - pendingWithdraw.amount;
+
+    await lawyer.save({ session });
+
+    pendingWithdraw.status = "Accepted";
+    await pendingWithdraw.save({ session });
+  });
+};
+
 export const adminServices = {
   loginAdminFromDB,
+  createNewAdminIntoDB,
+  acceptWithdrawRequest
 };

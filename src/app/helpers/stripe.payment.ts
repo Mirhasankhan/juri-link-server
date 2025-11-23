@@ -69,3 +69,16 @@ const generateOnboardingLink = async (accountId: string) => {
 
   return link.url;
 };
+
+export const transferMoneyToConnectedLawyer = async (
+  stripeAccountId: string,
+  amount: number
+) => {
+  const transfer = await stripe.transfers.create({
+    amount: Math.round(amount * 100),
+    currency: "usd",
+    destination: stripeAccountId,
+  });
+
+  return transfer;
+};

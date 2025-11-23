@@ -1,4 +1,4 @@
-import { Schema, model, Types, Document } from "mongoose";
+import { Schema, model } from "mongoose";
 import { TEarning, TWithdraw } from "./earning.interface";
 
 
