@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const UserRoleEnum = z.enum(["Admin", "User", "Lawyer"]);
+export const UserRoleEnum = z.enum(["User", "Lawyer"]);
 export const ServiceTypeEnum = z.enum(["Online", "In_Person", "Both"]);
 
 export const UserValidationSchema = z.object({
@@ -15,7 +15,8 @@ export const UserValidationSchema = z.object({
   serviceType: ServiceTypeEnum.optional(),
   specialization: z
     .array(z.string())
-    .nonempty("At least one specialization is required").optional(),
+    .nonempty("At least one specialization is required")
+    .optional(),
   role: UserRoleEnum,
 });
 

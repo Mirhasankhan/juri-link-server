@@ -36,7 +36,7 @@ const userSchema = new Schema<TUser>(
     specialization: { type: [String], default: [] },
     role: {
       type: String,
-      enum: ["User", "Admin", "Lawyer"],
+      enum: ["User", "Lawyer"],
       required: true,
     },
   },
@@ -64,7 +64,7 @@ const pendingUserSchema = new Schema<TUser>(
     role: {
       type: String,
       default: "User",
-      enum: ["User", "Admin", "Lawyer"],
+      enum: ["User", "Lawyer"],
     },
     otp: { type: String },
     expiresAt: { type: Date, required: true },

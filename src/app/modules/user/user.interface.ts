@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export type TUserRole = "Admin" | "User" | "Lawyer";
+export type TUserRole = "User" | "Lawyer";
 export type TServiceType = "Online" | "In_Person" | "Both";
 
 export type TUser = {
