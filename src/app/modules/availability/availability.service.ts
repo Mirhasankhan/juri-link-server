@@ -120,12 +120,11 @@ const deleteSlotFromDB = async (slotId: string) => {
   );
 };
 
-const updateSlotFromDB = async (slotId: string, data: any) => {
-  const slot = await AvailableSlotModel.findById(slotId).populate(
-    "availability"
-  );
+const updateSlotFromDB = async (slotId: string, data: any) => { 
+  const slot = await AvailableSlotModel.findById(slotId);
+  if (!slot) throw new Error("Slot not found");
 
-  const availabilityId = (slot as any).availability._id;
+  const availabilityId = slot.availabilityId;
   const allSlots = await AvailableSlotModel.find({ availabilityId });
 
   for (const existing of allSlots) {
@@ -154,6 +153,7 @@ const updateSlotFromDB = async (slotId: string, data: any) => {
     { new: true }
   );
 };
+
 
 const addNewSlotIntoDB = async (lawyerId: string, payload: any) => {
   let availability = await AvailabilityModel.findOne({

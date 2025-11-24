@@ -4,6 +4,7 @@ import app from "./app";
 import { Server } from "http";
 import { setupWebSocketServer } from "./app/modules/socket/socket.controller";
 import redisClient from "./app/utils/redis";
+import seedSuperAdmin from "./app/config/seeSuperAdmin";
 
 main().catch((err) => console.log(err));
 
@@ -18,6 +19,8 @@ async function main() {
     const server: Server = app.listen(config.port, () => {
       console.log(`✅ Server is running on port ${config.port}`);
     });
+
+    await seedSuperAdmin()
 
     await redisClient.connect();
 

@@ -3,6 +3,7 @@ import { adminController } from "./admin.controller";
 import validateRequest from "../../middleware/validateRequest";
 import { loginValidationSchema } from "../auth/auth.validation";
 import { adminValidationSchema } from "./admin.validation";
+import auth from "../../middleware/auth";
 
 const router = express.Router();
 router.post(
@@ -16,5 +17,10 @@ router.post(
   validateRequest(adminValidationSchema),
   adminController.createAdmin
 );
+router.post(
+  "/withdraw-request/accept/:id",
+  auth("SuperAdmin", "FinanceAdmin"),
+  adminController.acceptWithdrawRequest
+);
 
-export const authRoutes = router;
+export const adminRoutes = router;

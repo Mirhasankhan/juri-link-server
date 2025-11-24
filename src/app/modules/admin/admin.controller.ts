@@ -23,8 +23,18 @@ const createAdmin = catchAsync(async (req, res) => {
     message: "Admin created successfully",
   });
 });
+const acceptWithdrawRequest = catchAsync(async (req, res) => {
+  await adminServices.acceptWithdrawRequestFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Withdraw request accepted successfully",
+  });
+});
 
 export const adminController = {
   createAdmin,
   adminLogin,
+  acceptWithdrawRequest
 };

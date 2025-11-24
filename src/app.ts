@@ -10,7 +10,7 @@ import handleWebHook from "./app/helpers/stripe.webhook";
 const app: Application = express();
 
 app.post(
-  "/api/v1/stripe/payment-webhook",
+  "/webhook/stripe",
   express.raw({ type: "application/json" }),
   handleWebHook
 );

@@ -8,6 +8,7 @@ import { Admin, IAdmin } from "./admin.model";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
+
 const loginAdminFromDB = async (email: string, password: string) => {
   const admin = await Admin.findOne({ email });
 
@@ -39,16 +40,18 @@ const createNewAdminIntoDB = async (payload: IAdmin) => {
 
   if (existingAdmin) throw new AppError(409, "Admin already exists");
 
+   const hashedPassword = bcrypt.hashSync(payload.password, 10);
+
   await Admin.create({
     adminName: payload.adminName,
-    password: payload.password,
+    password: hashedPassword,
     role: payload.role,
     email: payload.email,
   });
   return;
 };
 
-const acceptWithdrawRequest = async (withdrawId: string) => {
+const acceptWithdrawRequestFromDB = async (withdrawId: string) => {
   const session = await mongoose.startSession();
 
   return session.withTransaction(async () => {
@@ -90,5 +93,5 @@ const acceptWithdrawRequest = async (withdrawId: string) => {
 export const adminServices = {
   loginAdminFromDB,
   createNewAdminIntoDB,
-  acceptWithdrawRequest
+  acceptWithdrawRequestFromDB
 };

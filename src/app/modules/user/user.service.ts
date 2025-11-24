@@ -150,7 +150,7 @@ const getProfileDetailsFromDb = async (userId: string) => {
   const { password, ...sanitizedUser } = userObj;
 
   return {
-    sanitizedUser,
+    ...sanitizedUser,
   };
 };
 

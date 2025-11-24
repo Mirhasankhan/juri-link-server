@@ -6,6 +6,6 @@ const router = Express.Router();
 
 router.post("/create", subscriptionPlanController.createSubscriptionPlan);
 router.get("/", subscriptionPlanController.getSubscriptionPlans);
-router.post("/checkout-session",auth("User"), subscriptionPlanController.createCheckoutSession);
+router.post("/checkout-session",auth("Lawyer"), subscriptionPlanController.createCheckoutSession);
 
 export const subscriptionPlanRoutes = router;

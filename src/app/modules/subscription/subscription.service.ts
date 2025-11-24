@@ -26,7 +26,7 @@ const createSubscriptionPlanIntoDB = async (req: Request) => {
   }
 
   let price;
-  
+
   try {
     price = await stripe.prices.create({
       unit_amount: Number(amount) * 100,
@@ -61,7 +61,7 @@ const getSubscriptionPlansFromDB = async () => {
         type: plan.type,
         features: plan.features,
         price: stripePrice.unit_amount! / 100,
-        priceId: plan.priceId
+        priceId: plan.priceId,
       };
     })
   );
@@ -69,6 +69,13 @@ const getSubscriptionPlansFromDB = async () => {
 };
 
 const createCheckoutSession = async (priceId: string, userId: string) => {
+  const user = await User.findOne({
+    _id: userId,
+  });
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
   const existingSubscription = await UserSubscription.findOne({
     userId,
     priceId,
@@ -80,12 +87,6 @@ const createCheckoutSession = async (priceId: string, userId: string) => {
       400,
       "User already has an active subscription for this plan."
     );
-  }
-  const user = await User.findOne({
-    _id: userId,
-  });
-  if (!user) {
-    throw new AppError(404, "User not found");
   }
 
   const successUrl = "https://api-topship.com/shipping/success";
@@ -100,7 +101,7 @@ const createCheckoutSession = async (priceId: string, userId: string) => {
         quantity: 1,
       },
     ],
-    success_url: successUrl + "?session_id={CHECKOUT_SESSION_ID}",
+    success_url: successUrl + `?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: cancelUrl,
     metadata: {
       userId,
@@ -146,6 +147,29 @@ const handleSubscriptionCreated = async (
     return result;
   } catch (error) {
     throw new AppError(500, "Failed to create or update the subscription");
+  }
+};
+
+const cancelSubscriptionFromDB = async (userId: string) => {
+  const userSubscription = await UserSubscription.findOne({ userId, status:"Active" });
+  if (!userSubscription) {
+    throw new AppError(404, "User subscription not found");
+  }
+  const response = await stripe.subscriptions.cancel(
+    userSubscription.subscriptionPayId
+  );
+  console.log(response);
+  if (response.status == "canceled") {
+    await User.updateOne({
+      _id: userId,
+      $set: { isSubscribed: false },
+    });
+    await UserSubscription.deleteOne({
+      userId,
+    });
+    return;
+  } else {
+    throw new AppError(400, "Subscription cancellation failed");
   }
 };
 

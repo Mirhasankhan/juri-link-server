@@ -5,11 +5,15 @@ import { earningServices } from "./earning.service";
 const lawerysEarningsSummary = catchAsync(async (req, res) => {
   const lawyerId = req.user.id;
   const type = (req.query.type as "weekly") || "monthly";
-  await earningServices.getLawyerEarningSummaryFromDB(lawyerId, type);
+  const result = await earningServices.getLawyerEarningSummaryFromDB(
+    lawyerId,
+    type
+  );
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: "Earning summary retrieved successfully",
+    data: result,
   });
 });
 

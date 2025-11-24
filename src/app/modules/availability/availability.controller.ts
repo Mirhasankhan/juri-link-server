@@ -55,6 +55,7 @@ const addNewSlot = catchAsync(async (req: Request, res: Response) => {
 });
 const updateSlot = catchAsync(async (req: Request, res: Response) => {
   const { slotId, slot } = req.body;
+
   const result = await availabilityServices.updateSlotFromDB(slotId, slot);
   sendResponse(res, {
     success: true,

@@ -80,6 +80,7 @@ const handleWebHook = catchAsync(async (req: any, res: any) => {
       const subscriptionMetadata = subscription.metadata || {};
       const deletedPriceId = subscriptionMetadata.priceId as string;
       const deletedUserId = subscriptionMetadata.userId as string;
+      await cancelSubscriptionFromD
       //   await stripeService.handleSubscriptionStatusUpdate(
       //     deletedUserId,
       //     deletedPriceId,
