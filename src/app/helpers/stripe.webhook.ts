@@ -80,7 +80,9 @@ const handleWebHook = catchAsync(async (req: any, res: any) => {
       const subscriptionMetadata = subscription.metadata || {};
       const deletedPriceId = subscriptionMetadata.priceId as string;
       const deletedUserId = subscriptionMetadata.userId as string;
-      await cancelSubscriptionFromD
+
+      console.log(subscriptionMetadata, "kljsddfkljfsdkljsdfkjlkjlfsdkjlsdf");
+
       //   await stripeService.handleSubscriptionStatusUpdate(
       //     deletedUserId,
       //     deletedPriceId,
@@ -91,14 +93,16 @@ const handleWebHook = catchAsync(async (req: any, res: any) => {
     // One-Time Payments
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log(session?.metadata);
-
+   
       const userId = session.metadata?.userId;
       const priceId = session.metadata?.priceId;
-      const subscriptionPayId = session.subscription as string; 
+      const subscriptionPayId = session.subscription as string;
 
-      const result = await subscriptionPlanServices.handleSubscriptionCreated(priceId as string,userId as string,subscriptionPayId)
-      console.log(result);
+      await subscriptionPlanServices.handleSubscriptionCreated(
+        priceId as string,
+        userId as string,
+        subscriptionPayId
+      );
 
       break;
     }

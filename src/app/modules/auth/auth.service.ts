@@ -133,7 +133,7 @@ const updateUserDetailsIntoDB = async (req: Request) => {
     const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
     payload.profileImage = uploadedMedia[0].secure_url;
   }
- 
+
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { $set: payload },
@@ -142,10 +142,37 @@ const updateUserDetailsIntoDB = async (req: Request) => {
 
   return updatedUser;
 };
+const uploadIntroVideoIntoDB = async (req: Request) => {
+  const userId = req.user.id;
+  let introVideoLink = "";
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  const files = req.files as IUploadFile[] | undefined;
+
+  if (files && files.length > 0) {
+    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
+    introVideoLink = uploadedMedia[0].secure_url;
+  }
+
+  if (!introVideoLink) {
+    throw new AppError(404, "Intro video required");
+  }
+
+  await User.findByIdAndUpdate(userId, {
+    $set: { introVideo: introVideoLink },
+  });
+
+  return;
+};
 export const authServices = {
   loginUserIntoDB,
   sendForgotPasswordOtpDB,
   verifyForgotPasswordOtpCode,
+  uploadIntroVideoIntoDB,
   resetPasswordIntoDB,
-  updateUserDetailsIntoDB
+  updateUserDetailsIntoDB,
 };

@@ -229,6 +229,12 @@ const getAllUsersFromDB = async (
         as: "legalServices",
       },
     },
+
+    {
+      $sort: {
+        isSubscribed: -1,
+      },
+    },
     {
       $project: {
         fullName: 1,
@@ -238,7 +244,7 @@ const getAllUsersFromDB = async (
         experience: 1,
         serviceType: 1,
         specialization: 1,
-        location:1,
+        location: 1,
         legalServices: 1,
         profileImage: 1,
       },

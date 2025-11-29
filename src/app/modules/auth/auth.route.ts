@@ -6,7 +6,6 @@ import { parseBodyData } from "../../middleware/parseBodyData";
 import validateRequest from "../../middleware/validateRequest";
 import { loginValidationSchema } from "./auth.validation";
 
-
 const router = express.Router();
 router.post(
   "/login",
@@ -22,6 +21,13 @@ router.put(
   FileUploadHelper.upload.array("files", 1),
   parseBodyData,
   authController.updateUser
+);
+router.put(
+  "/upload/intro-video",
+  auth(),
+  FileUploadHelper.upload.array("files", 1),
+  // parseBodyData,
+  authController.uploadIntroVideo
 );
 
 export const authRoutes = router;

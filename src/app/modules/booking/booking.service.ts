@@ -6,7 +6,6 @@ import Stripe from "stripe";
 import mongoose from "mongoose";
 import AppError from "../../utils/AppError";
 import {
-  cancelZoomMeeting,
   createZoomMeeting,
 } from "../../helpers/zoom.helper";
 import { createStripeOneTimePaymentIntent } from "../../helpers/stripe.payment";
@@ -61,7 +60,7 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
 
     return newBooking;
   } else {
-    throw new AppError(404, "Booking failed")
+    throw new AppError(404, "Booking failed");
   }
 };
 
@@ -83,7 +82,8 @@ const getUserWiseBookingsFromDB = async (userId: string) => {
       path: "lawyerId",
       select: "fullName profileImage location",
       model: "User",
-    });
+    })
+    .sort({ date: -1 });
 
   return {
     bookings,
@@ -107,7 +107,8 @@ const getLawyerWiseBookingsFromDB = async (lawyerId: string) => {
       path: "userId",
       select: "fullName profileImage",
       model: "User",
-    });
+    })
+    .sort({ date: -1 });
 
   return {
     bookings,
@@ -183,8 +184,8 @@ const cancelBookingFromDB = async (payload: any) => {
       { _id: payload.bookingId },
       { $set: { status: "Cancelled", cancelReason: payload.cancelReason } }
     );
-    const response = await cancelZoomMeeting("89174782204");
-    console.log(response);
+ 
+
   }
   return;
 };

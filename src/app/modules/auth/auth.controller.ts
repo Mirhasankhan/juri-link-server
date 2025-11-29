@@ -54,7 +54,16 @@ const updateUser = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "user details successfully",
-    data:result
+    data: result,
+  });
+});
+const uploadIntroVideo = catchAsync(async (req, res) => {
+  await authServices.uploadIntroVideoIntoDB(req);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Intro video uploaded successfully",
   });
 });
 
@@ -62,6 +71,7 @@ export const authController = {
   loginUser,
   sendOtp,
   verifyOtp,
+  uploadIntroVideo,
   resetPassword,
-  updateUser
+  updateUser,
 };

@@ -18,6 +18,7 @@ const userSchema = new Schema<TUser>(
     stripeUserId: { type: String, required: true },
     stripeAccountId: { type: String },
     profileImage: { type: String },
+    introVideo: { type: String },
     phone: { type: String },
     location: { type: String },
     about: { type: String },

@@ -11,6 +11,7 @@ export type TUser = {
   stripeAccountId: string;
   stripeUserId: string;
   profileImage?: string;
+  introVideo?: string;
   phone?: string;
   about?: string;
   institute?: string;

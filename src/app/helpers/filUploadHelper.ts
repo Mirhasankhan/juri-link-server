@@ -20,11 +20,13 @@ const upload = multer({
       "image/jpeg",
       "image/png",
       "image/jpg",
+      "image/webp",
       "image/gif",
       "image/avif",
       "video/mp4",
       "video/mov",
       "video/avi",
+      "application/pdf", 
     ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);

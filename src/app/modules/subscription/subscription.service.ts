@@ -50,22 +50,42 @@ const createSubscriptionPlanIntoDB = async (req: Request) => {
   return newSubscription;
 };
 
-const getSubscriptionPlansFromDB = async () => {
-  const plans = await Subscription.find();
-  const plansWithPrice = await Promise.all(
+const getSubscriptionPlansFromDB = async (userId: string) => {
+  const user = await User.findOne({ _id: userId, role: "Lawyer" });
+  if (!user) throw new AppError(404, "Lawyer not found");
+
+  const userSub = await UserSubscription.findOne({
+    userId,
+  }).lean();
+
+  const plans = await Subscription.find().lean();
+
+  const enrichedPlans = await Promise.all(
     plans.map(async (plan) => {
       const stripePrice = await stripe.prices.retrieve(plan.priceId);
 
+      const isCurrent =
+        userSub && String(userSub.subscriptionId) === String(plan._id);
+
       return {
+        planId: plan._id,
         title: plan.title,
         type: plan.type,
         features: plan.features,
         price: stripePrice.unit_amount! / 100,
         priceId: plan.priceId,
+        interval: plan.interval,
+        userSubscription: isCurrent
+          ? {
+              subscriptionId: userSub.subscriptionId,
+              subscriptionPayId: userSub.subscriptionPayId,
+            }
+          : null,
       };
     })
   );
-  return plansWithPrice;
+
+  return enrichedPlans;
 };
 
 const createCheckoutSession = async (priceId: string, userId: string) => {
@@ -151,7 +171,10 @@ const handleSubscriptionCreated = async (
 };
 
 const cancelSubscriptionFromDB = async (userId: string) => {
-  const userSubscription = await UserSubscription.findOne({ userId, status:"Active" });
+  const userSubscription = await UserSubscription.findOne({
+    userId,
+    status: "ACTIVE",
+  });
   if (!userSubscription) {
     throw new AppError(404, "User subscription not found");
   }
@@ -159,11 +182,12 @@ const cancelSubscriptionFromDB = async (userId: string) => {
     userSubscription.subscriptionPayId
   );
   console.log(response);
+
   if (response.status == "canceled") {
-    await User.updateOne({
-      _id: userId,
-      $set: { isSubscribed: false },
-    });
+    await User.updateOne(
+      { _id: userId }, 
+      { $set: { isSubscribed: false } } 
+    );
     await UserSubscription.deleteOne({
       userId,
     });
@@ -177,5 +201,6 @@ export const subscriptionPlanServices = {
   createSubscriptionPlanIntoDB,
   createCheckoutSession,
   handleSubscriptionCreated,
+  cancelSubscriptionFromDB,
   getSubscriptionPlansFromDB,
 };

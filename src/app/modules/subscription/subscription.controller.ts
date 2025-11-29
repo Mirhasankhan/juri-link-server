@@ -11,7 +11,9 @@ const createSubscriptionPlan = catchAsync(async (req, res) => {
   });
 });
 const getSubscriptionPlans = catchAsync(async (req, res) => {
-  const result = await subscriptionPlanServices.getSubscriptionPlansFromDB();
+  const result = await subscriptionPlanServices.getSubscriptionPlansFromDB(
+    req.user.id
+  );
   sendResponse(res, {
     success: true,
     statusCode: 200,
@@ -31,9 +33,18 @@ const createCheckoutSession = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const cancelSubscription = catchAsync(async (req, res) => {
+  await subscriptionPlanServices.cancelSubscriptionFromDB(req.user.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Subscription cancelled created",
+  });
+});
 
 export const subscriptionPlanController = {
   createSubscriptionPlan,
   getSubscriptionPlans,
   createCheckoutSession,
+  cancelSubscription
 };
