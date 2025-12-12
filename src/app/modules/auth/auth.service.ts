@@ -127,20 +127,13 @@ const updateUserDetailsIntoDB = async (req: Request) => {
     throw new AppError(404, "User not found");
   }
 
-  const files = req.files as IUploadFile[] | undefined;
-
-  if (files && files.length > 0) {
-    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
-    payload.profileImage = uploadedMedia[0].secure_url;
-  }
-
-  const updatedUser = await User.findByIdAndUpdate(
+ await User.findByIdAndUpdate(
     userId,
     { $set: payload },
     { new: true, runValidators: true }
   );
 
-  return updatedUser;
+  return;
 };
 const uploadIntroVideoIntoDB = async (req: Request) => {
   const userId = req.user.id;
@@ -168,6 +161,32 @@ const uploadIntroVideoIntoDB = async (req: Request) => {
 
   return;
 };
+const uploadProfileImageIntoDB = async (req: Request) => {
+  const userId = req.user.id;
+  let profileImage = "";
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  const files = req.files as IUploadFile[] | undefined;
+
+  if (files && files.length > 0) {
+    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
+    profileImage = uploadedMedia[0].secure_url;
+  }
+
+  if (!profileImage) {
+    throw new AppError(404, "Profile image required");
+  }
+
+  await User.findByIdAndUpdate(userId, {
+    $set: { profileImage },
+  });
+
+  return;
+};
 export const authServices = {
   loginUserIntoDB,
   sendForgotPasswordOtpDB,
@@ -175,4 +194,5 @@ export const authServices = {
   uploadIntroVideoIntoDB,
   resetPasswordIntoDB,
   updateUserDetailsIntoDB,
+  uploadProfileImageIntoDB
 };

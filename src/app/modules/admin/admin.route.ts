@@ -14,9 +14,16 @@ router.post(
 
 router.post(
   "/create",
+  auth("SuperAdmin"),
   validateRequest(adminValidationSchema),
   adminController.createAdmin
 );
+
+router.get("/all", auth("SuperAdmin"), adminController.allAdmins);
+router.get("/all-users", auth("SuperAdmin", "UserAdmin"), adminController.allUsers);
+router.get("/all-lawyers", auth("SuperAdmin", "UserAdmin"), adminController.allLawyers);
+router.get("/withdraw-requests", auth("SuperAdmin", "UserAdmin"), adminController.withdrawRequests);
+router.delete("/delete/:id", auth("SuperAdmin"), adminController.deleteAdmin);
 router.post(
   "/withdraw-request/accept/:id",
   auth("SuperAdmin", "FinanceAdmin"),

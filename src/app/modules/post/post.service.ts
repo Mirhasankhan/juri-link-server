@@ -37,7 +37,7 @@ const getAllPostsFromDB = async (
 
   const posts = await Post.find(filter)
     .populate("serviceId", "serviceName -_id")
-    .populate("userId", "fullName profileImage -_id")
+    .populate("userId", "fullName profileImage _id")
     .populate({
       path: "comments",
       select: "_id -postId",

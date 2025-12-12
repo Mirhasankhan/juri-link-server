@@ -78,7 +78,8 @@ const getExpertDayWiseSlotsFromDB = async (
       const endPoint = targetDate.hour(end.hour()).minute(end.minute());
 
       while (pointer.isBefore(endPoint)) {
-        const next = pointer.add(30, "minute");
+        // const next = pointer.add(30, "minute");
+        const next = pointer.add(1, "hour");
         if (next.isAfter(now)) {
           result.push({
             start: pointer.format("hh:mm A"),
