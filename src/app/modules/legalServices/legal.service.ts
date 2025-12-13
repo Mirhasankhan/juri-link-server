@@ -7,6 +7,7 @@ import { User } from "../user/user.model";
 
 const createLegalServiceIntoDB = async (req: Request) => {
   const payload = req.body;
+ 
 
   const existingService = await LegalService.findOne({
     serviceName: { $regex: `^${payload.serviceName.trim()}$`, $options: "i" },
@@ -14,12 +15,17 @@ const createLegalServiceIntoDB = async (req: Request) => {
   if (existingService) {
     throw new AppError(409, "Legal service already exists");
   }
+
   const files = req.files as IUploadFile[] | undefined;
-  if (!files || files.length === 0) {
-    throw new AppError(400, "Service icon is required");
+
+  if (files && files.length > 0) {
+    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
+    payload.serviceMedia = uploadedMedia[0].secure_url;
   }
-  const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
-  payload.serviceIcon = uploadedMedia[0].secure_url;
+
+  if (!payload.serviceMedia) {
+    throw new AppError(404, "Service image required");
+  }
 
   const legalService = await LegalService.create(payload);
 
@@ -31,24 +37,23 @@ const getAllLegalServicesFromDB = async () => {
   return legalServices;
 };
 
-const getSingleLegalServiceFromDB = async (serviceId: string) => { 
+const getSingleLegalServiceFromDB = async (serviceId: string) => {
   const existingService = await LegalService.findById(serviceId).lean();
   if (!existingService) {
     throw new AppError(404, "Service not found!");
   }
 
   const usersWithSpecialization = await User.find({
-    specialization: serviceId
+    specialization: serviceId,
   })
     .select("fullName email profileImage experience serviceType specialization")
     .lean();
 
   return {
     service: existingService,
-    users: usersWithSpecialization
+    users: usersWithSpecialization,
   };
 };
-
 
 export const legalServices = {
   createLegalServiceIntoDB,

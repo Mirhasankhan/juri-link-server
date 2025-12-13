@@ -9,12 +9,12 @@ const router = Express.Router();
 
 router.post(
   "/create",
-  FileUploadHelper.upload.array("serviceIcon", 1),
+  FileUploadHelper.upload.array("serviceMedia", 1),
   parseBodyData,
   validateRequest(LegalValidationSchema),
   legalServiceController.createLegalService
 );
-router.get("/", legalServiceController.getLegalServices)
-router.get("/:id", legalServiceController.getSingleService)
+router.get("/", legalServiceController.getLegalServices);
+router.get("/:id", legalServiceController.getSingleService);
 
 export const legalServiceRoutes = router;

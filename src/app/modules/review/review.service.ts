@@ -27,7 +27,8 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
           userId,
           lawyerId,
           comment: payload.comment,
-          rating: payload.rating
+          rating: payload.rating,
+          bookingId: payload.bookingId
         },
       ],
       { session }
