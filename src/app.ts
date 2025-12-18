@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://juri-link-frontend.vercel.app"],
+    origin: ["http://localhost:3000", "https://juri-link-frontend.vercel.app","http://65.1.15.178:3000"],
     credentials: true,
   })
 );
