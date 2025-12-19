@@ -167,8 +167,8 @@ const getLawyerDetailsFromDb = async (lawyerId: string) => {
     "serviceName"
   ).lean();
 
-  const reviews = await Review.find({ userId: lawyerId })
-    .populate("userId", "name email")
+  const reviews = await Review.find({ lawyerId })
+    .populate("userId", "name email profileImage")
     .lean();
 
   const { password, ...sanitizedUser } = lawyer;
