@@ -4,6 +4,7 @@ interface TLegalService {
   serviceName: string;
   serviceMedia: string;
   importance: string;
+  dyk:string;
   description: string;
   totalBooked: number;
 }
@@ -14,6 +15,7 @@ const LegalServiceSchema = new Schema<TLegalService>(
     serviceMedia: { type: String, required: true },
     importance: { type: String, required: true },
     description: { type: String, required: true },
+    dyk: { type: String, required: true },
     totalBooked: { type: Number, default: 0 },
   },
   {

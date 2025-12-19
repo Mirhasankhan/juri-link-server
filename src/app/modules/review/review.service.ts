@@ -13,8 +13,10 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
     if (!existingUser) {
       throw new AppError(404, "User not found");
     }
-   
-    const existingBooking = await Booking.findById(payload.bookingId).session(session);
+
+    const existingBooking = await Booking.findById(payload.bookingId).session(
+      session
+    );
     if (!existingBooking) {
       throw new AppError(404, "Booking not found");
     }
@@ -23,19 +25,21 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
 
     const review = await Review.create(
       [
-        {         
+        {
           userId,
           lawyerId,
           comment: payload.comment,
           rating: payload.rating,
-          bookingId: payload.bookingId
+          bookingId: payload.bookingId,
         },
       ],
       { session }
     );
 
-    const lawyerBookings = await Booking.find({ lawyerId }).select("_id").session(session);
-    const bookingIds = lawyerBookings.map(b => b._id);
+    const lawyerBookings = await Booking.find({ lawyerId })
+      .select("_id")
+      .session(session);
+    const bookingIds = lawyerBookings.map((b) => b._id);
 
     const stats = await Review.aggregate([
       { $match: { bookingId: { $in: bookingIds } } },
@@ -55,7 +59,14 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
         avgRating: stats[0]?.avgRating || 0,
       },
       { session }
-    );   
+    );
+    await Booking.findByIdAndUpdate(
+      payload.bookingId,
+      {
+        isReviewed: true,
+      },
+      { session }
+    );
     await session.commitTransaction();
     session.endSession();
 

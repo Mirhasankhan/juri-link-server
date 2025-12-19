@@ -15,6 +15,7 @@ export interface TBooking {
   startUrl?: string;
   joinUrl?: string;
   refundReason?: string;
+  isReviewed?: boolean;
   cancelReason?: string;
 }
 
@@ -45,6 +46,7 @@ const BookingSchema = new Schema<TBooking>(
     serviceDescription: { type: String, required: true },
     fee: { type: Number, required: true },
     refundReason: { type: String },
+    isReviewed: { type: Boolean },
     startUrl: { type: String },
     joinUrl: { type: String },
     cancelReason: { type: String },

@@ -73,7 +73,7 @@ const getUserWiseBookingsFromDB = async (userId: string) => {
   }
 
   const bookings = await Booking.find({ userId })
-    .select("time date fee serviceType status serviceId lawyerId joinUrl")
+    .select("time date fee serviceType status serviceId lawyerId joinUrl cancelReason isReviewed")
     .populate({
       path: "serviceId",
       select: "serviceName",

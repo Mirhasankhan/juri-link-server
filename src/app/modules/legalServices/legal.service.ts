@@ -43,15 +43,10 @@ const getSingleLegalServiceFromDB = async (serviceId: string) => {
     throw new AppError(404, "Service not found!");
   }
 
-  const usersWithSpecialization = await User.find({
-    specialization: serviceId,
-  })
-    .select("fullName email profileImage experience serviceType specialization")
-    .lean();
 
   return {
     service: existingService,
-    users: usersWithSpecialization,
+   
   };
 };
 
