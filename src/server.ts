@@ -22,7 +22,7 @@ async function main() {
 
     await seedSuperAdmin()
 
-    // await redisClient.connect();
+    await redisClient.connect();
 
     setupWebSocketServer(server);
   } catch (err: any) {
