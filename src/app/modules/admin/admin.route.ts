@@ -29,5 +29,6 @@ router.post(
   auth("SuperAdmin", "FinanceAdmin"),
   adminController.acceptWithdrawRequest
 );
+router.get("/reports", auth("SuperAdmin", "UserAdmin"), adminController.allReports);
 
 export const adminRoutes = router;

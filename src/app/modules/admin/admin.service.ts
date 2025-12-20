@@ -3,6 +3,7 @@ import { transferMoneyToConnectedLawyer } from "../../helpers/stripe.payment";
 import AppError from "../../utils/AppError";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import { Withdraw } from "../earning/earning.model";
+import { Report } from "../review/review.model";
 import { User } from "../user/user.model";
 import { Admin, IAdmin, TAdminRole } from "./admin.model";
 import bcrypt from "bcrypt";
@@ -226,9 +227,35 @@ const acceptWithdrawRequestFromDB = async (withdrawId: string) => {
   });
 };
 
+const getAllReportsFromDB = async (status?: string) => {
+  const query: any = {};
+  if (status) query.status = status;
+
+  const reports = await Report.find(query)
+    .populate({
+      path: "bookingId",
+      select: "serviceType date time userId lawyerId",
+      populate: [
+        {
+          path: "userId",
+          select: "profileImage fullName email"
+        },
+        {
+          path: "lawyerId",
+          select: "profileImage fullName email"
+        }
+      ]
+    })
+    .exec();
+
+  return reports;
+};
+
+
 export const adminServices = {
   loginAdminFromDB,
   createNewAdminIntoDB,
+  getAllReportsFromDB,
   acceptWithdrawRequestFromDB,
   getAllAdminsFromDB,
   getAllUsersFromDB,

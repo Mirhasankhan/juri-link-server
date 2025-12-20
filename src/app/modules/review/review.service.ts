@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 import AppError from "../../utils/AppError";
 import { Booking } from "../booking/booking.model";
 import { User } from "../user/user.model";
-import { Review, TReview } from "./review.model";
+import { Report, Review, TReport, TReview } from "./review.model";
+import { Request } from "express";
+import { IUploadFile } from "../../interface/file";
+import { FileUploadHelper } from "../../helpers/filUploadHelper";
 
 const createReviewIntoDB = async (userId: string, payload: TReview) => {
   const session = await mongoose.startSession();
@@ -78,6 +81,44 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
   }
 };
 
+const createReportIntoDB = async (req: Request) => {
+  const payload = req.body;
+
+  const booking = await Booking.findOne({
+    _id: payload.bookingId,
+    status: "Completed",
+    isReported: false,
+  });
+
+  if (!booking) {
+    throw new AppError(404, "Booking is not eligible for reporting.");
+  }
+
+  let media = "";
+
+  const files = req.files as IUploadFile[] | undefined;
+
+  if (files && files.length > 0) {
+    const uploadedMedia = await FileUploadHelper.uploadToCloudinary(files);
+    media = uploadedMedia[0].secure_url;
+  }
+
+  await Report.create({
+    bookingId: payload.bookingId,
+    comment: payload.comment,
+    reportType: payload.reportType,
+    media,
+  });
+
+  await Booking.updateOne(
+    { _id: payload.bookingId },
+    { $set: { isReported: true } }
+  );
+
+  return;
+};
+
 export const reviewServices = {
   createReviewIntoDB,
+  createReportIntoDB
 };

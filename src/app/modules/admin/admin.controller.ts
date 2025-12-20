@@ -91,8 +91,23 @@ const acceptWithdrawRequest = catchAsync(async (req, res) => {
   });
 });
 
+const allReports = catchAsync(async (req, res) => {
+  const status = req.query.status;
+  const result = await adminServices.getAllReportsFromDB(
+    status as string
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Reports Retrieved successfully",
+    data: result,
+  });
+});
+
 export const adminController = {
   createAdmin,
+  allReports,
   adminLogin,
   acceptWithdrawRequest,
   deleteAdmin,

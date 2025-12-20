@@ -63,7 +63,6 @@ const createBookingIntoDb = async (userId: string, payload: TBooking) => {
     throw new AppError(404, "Booking failed");
   }
 };
-
 const getUserWiseBookingsFromDB = async (userId: string) => {
   const existingUser = await User.findById(userId).select(
     "fullName profileImage"
@@ -114,7 +113,6 @@ const getLawyerWiseBookingsFromDB = async (lawyerId: string) => {
     bookings,
   };
 };
-
 const markBookingAsCompletedInDB = async (bookingId: string) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -163,7 +161,6 @@ const markBookingAsCompletedInDB = async (bookingId: string) => {
     session.endSession();
   }
 };
-
 const cancelBookingFromDB = async (payload: any) => {
   const booking = await Booking.findOne({
     _id: payload.bookingId,
