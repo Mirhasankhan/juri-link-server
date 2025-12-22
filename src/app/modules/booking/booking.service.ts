@@ -72,7 +72,7 @@ const getUserWiseBookingsFromDB = async (userId: string) => {
   }
 
   const bookings = await Booking.find({ userId })
-    .select("time date fee serviceType status serviceId lawyerId joinUrl cancelReason isReviewed")
+    .select("time date fee serviceType status serviceId lawyerId joinUrl cancelReason isReviewed isReported")
     .populate({
       path: "serviceId",
       select: "serviceName",
@@ -180,8 +180,7 @@ const cancelBookingFromDB = async (payload: any) => {
     await Booking.updateOne(
       { _id: payload.bookingId },
       { $set: { status: "Cancelled", cancelReason: payload.cancelReason } }
-    );
- 
+    ); 
 
   }
   return;

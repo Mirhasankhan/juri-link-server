@@ -1,13 +1,17 @@
+import Stripe from "stripe";
 import config from "../../config";
 import { transferMoneyToConnectedLawyer } from "../../helpers/stripe.payment";
 import AppError from "../../utils/AppError";
 import { jwtHelpers } from "../../utils/jwtHelpers";
+import { Booking } from "../booking/booking.model";
 import { Withdraw } from "../earning/earning.model";
 import { Report } from "../review/review.model";
 import { User } from "../user/user.model";
 import { Admin, IAdmin, TAdminRole } from "./admin.model";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+
+const stripe = new Stripe(config.stripe.stripe_secret as string);
 
 const loginAdminFromDB = async (email: string, password: string) => {
   const admin = await Admin.findOne({ email });
@@ -122,7 +126,7 @@ const getAllLawyersFromDB = async (search?: string) => {
 
     {
       $addFields: {
-        totalBookings: { $size: "$bookings" },    
+        totalBookings: { $size: "$bookings" },
       },
     },
 
@@ -133,13 +137,13 @@ const getAllLawyersFromDB = async (search?: string) => {
         phone: 1,
         address: 1,
         profileImage: 1,
-        location:1,
-        avgRating:1,
-        totalReview:1,
-        availabilitySetup:1,
+        location: 1,
+        avgRating: 1,
+        totalReview: 1,
+        availabilitySetup: 1,
         introVideo: 1,
-        allTimeEarning:1,
-        totalBookings: 1,    
+        allTimeEarning: 1,
+        totalBookings: 1,
         _id: 1,
       },
     },
@@ -182,7 +186,7 @@ const getAllWithdrawRequestsFromDB = async (status?: string) => {
   if (status) query.status = status;
 
   const withdraws = await Withdraw.find(query)
-    .populate("lawyerId", "profileImage fullName email") 
+    .populate("lawyerId", "profileImage fullName email")
     .exec();
 
   return withdraws;
@@ -199,7 +203,10 @@ const acceptWithdrawRequestFromDB = async (withdrawId: string) => {
     );
 
     if (!pendingWithdraw) {
-      throw new AppError(404, "Withdraw request not found or already completed");
+      throw new AppError(
+        404,
+        "Withdraw request not found or already completed"
+      );
     }
 
     const lawyer = await User.findById(pendingWithdraw.lawyerId, null, {
@@ -238,19 +245,67 @@ const getAllReportsFromDB = async (status?: string) => {
       populate: [
         {
           path: "userId",
-          select: "profileImage fullName email"
+          select: "profileImage fullName email",
         },
         {
           path: "lawyerId",
-          select: "profileImage fullName email"
-        }
-      ]
+          select: "profileImage fullName email",
+        },
+      ],
     })
     .exec();
 
   return reports;
 };
 
+const responseToReportIntoDB = async (payload: any) => {
+  const report = await Report.findOne({
+    _id: payload.reportId,
+    status: "Pending",
+  });
+
+  if (!report) {
+    throw new AppError(404, "Report not found or already responded");
+  }
+
+  const booking = await Booking.findById(report.bookingId);
+
+  if (!booking || !booking.paymentIntentId) {
+    throw new AppError(404, "Booking or payment not found");
+  }
+
+  if (payload.status === "Got_Refund") {
+    const refund = await stripe.refunds.create({
+      payment_intent: booking.paymentIntentId,
+    });
+
+    if (refund.status !== "succeeded") {
+      throw new AppError(400, "Refund failed");
+    }
+
+    await User.updateOne(
+      { _id: booking.lawyerId },
+      {
+        $inc: {
+          currentEarning: -booking.fee,
+          allTimeEarning: -booking.fee,
+        },
+      }
+    );
+  }
+
+  await Report.updateOne(
+    { _id: payload.reportId },
+    {
+      $set: {
+        status: payload.status,
+        adminReply: payload.adminReply,
+      },
+    }
+  );
+
+  return;
+};
 
 export const adminServices = {
   loginAdminFromDB,
@@ -260,6 +315,7 @@ export const adminServices = {
   getAllAdminsFromDB,
   getAllUsersFromDB,
   getAllLawyersFromDB,
+  responseToReportIntoDB,
   deleteAdminFromDB,
-  getAllWithdrawRequestsFromDB
+  getAllWithdrawRequestsFromDB,
 };

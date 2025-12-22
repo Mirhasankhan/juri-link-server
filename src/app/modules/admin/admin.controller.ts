@@ -93,15 +93,22 @@ const acceptWithdrawRequest = catchAsync(async (req, res) => {
 
 const allReports = catchAsync(async (req, res) => {
   const status = req.query.status;
-  const result = await adminServices.getAllReportsFromDB(
-    status as string
-  );
+  const result = await adminServices.getAllReportsFromDB(status as string);
 
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: "Reports Retrieved successfully",
     data: result,
+  });
+});
+const responseToReport = catchAsync(async (req, res) => {
+  await adminServices.responseToReportIntoDB(req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Report responded successfully",
   });
 });
 
@@ -114,5 +121,6 @@ export const adminController = {
   allUsers,
   allLawyers,
   allAdmins,
-  withdrawRequests
+  withdrawRequests,
+  responseToReport
 };
