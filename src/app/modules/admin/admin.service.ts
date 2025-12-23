@@ -10,6 +10,7 @@ import { User } from "../user/user.model";
 import { Admin, IAdmin, TAdminRole } from "./admin.model";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { LegalService } from "../legalServices/legalService.model";
 
 const stripe = new Stripe(config.stripe.stripe_secret as string);
 
@@ -307,6 +308,21 @@ const responseToReportIntoDB = async (payload: any) => {
   return;
 };
 
+const getDashboardOverviewFromDB = async()=>{
+  const totalUsers = await User.countDocuments({role:"User"})
+  const totalExpert = await User.countDocuments({role:"Lawyer"})
+  const totalServices = await LegalService.countDocuments()
+  const totalConsultation = await Booking.countDocuments({status:"Completed"})
+
+  return {
+    totalUsers,
+    totalExpert,
+    totalServices,
+    totalConsultation
+  }
+}
+
+
 export const adminServices = {
   loginAdminFromDB,
   createNewAdminIntoDB,
@@ -318,4 +334,5 @@ export const adminServices = {
   responseToReportIntoDB,
   deleteAdminFromDB,
   getAllWithdrawRequestsFromDB,
+  getDashboardOverviewFromDB
 };

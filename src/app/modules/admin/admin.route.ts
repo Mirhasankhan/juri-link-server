@@ -49,6 +49,11 @@ router.get(
   auth("SuperAdmin", "UserAdmin"),
   adminController.allReports
 );
+router.get(
+  "/overview",
+  auth("SuperAdmin", "UserAdmin"),
+  adminController.dashboardOverview
+);
 router.put(
   "/response-report",
   auth("SuperAdmin", "UserAdmin"),

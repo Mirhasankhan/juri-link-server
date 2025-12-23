@@ -111,6 +111,16 @@ const responseToReport = catchAsync(async (req, res) => {
     message: "Report responded successfully",
   });
 });
+const dashboardOverview = catchAsync(async (req, res) => {
+  const result = await adminServices.getDashboardOverviewFromDB();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Overview retrieved successfully",
+    data: result
+  });
+});
 
 export const adminController = {
   createAdmin,
@@ -118,6 +128,7 @@ export const adminController = {
   adminLogin,
   acceptWithdrawRequest,
   deleteAdmin,
+  dashboardOverview,
   allUsers,
   allLawyers,
   allAdmins,
