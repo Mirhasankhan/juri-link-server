@@ -59,7 +59,7 @@ const createReviewIntoDB = async (userId: string, payload: TReview) => {
       lawyerId,
       {
         totalReview: stats[0]?.totalReview || 0,
-        avgRating: stats[0]?.avgRating || 0,
+        avgRating: stats[0]?.avgRating.toFixed(1) || 0,
       },
       { session }
     );
@@ -112,7 +112,7 @@ const createReportIntoDB = async (req: Request) => {
 
   await Booking.updateOne(
     { _id: payload.bookingId },
-    { $set: { isReported: true } }
+    { $set: { isReportedByUser: true } }
   );
 
   return;

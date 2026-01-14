@@ -5,15 +5,17 @@ import { FileUploadHelper } from "../../helpers/filUploadHelper";
 import { parseBodyData } from "../../middleware/parseBodyData";
 import validateRequest from "../../middleware/validateRequest";
 import { loginValidationSchema, updateUserSchema } from "./auth.validation";
+import rateLimiter from "../../middleware/rateLimiter";
 
 const router = express.Router();
 router.post(
   "/login",
+  rateLimiter(1, 3),
   validateRequest(loginValidationSchema),
   authController.loginUser
 );
-router.post("/send-otp", authController.sendOtp);
-router.post("/verify-otp", authController.verifyOtp);
+router.post("/send-otp", rateLimiter(1, 5), authController.sendOtp);
+router.post("/verify-otp", rateLimiter(1, 3), authController.verifyOtp);
 router.patch("/reset-password", auth(), authController.resetPassword);
 router.put(
   "/update",
