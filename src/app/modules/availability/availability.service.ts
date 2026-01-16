@@ -18,8 +18,8 @@ const createUserAvailability = async (
   lawyerId: string,
   availability: any[]
 ) => {
-  await AvailabilityModel.deleteMany({ lawyerId });
-  await AvailableSlotModel.deleteMany({});
+  // await AvailabilityModel.deleteMany({ lawyerId });
+  // await AvailableSlotModel.deleteMany({});
 
   const created = [];
 

@@ -240,6 +240,7 @@ const getAllUsersFromDB = async (
         fullName: 1,
         email: 1,
         avgRating: 1,
+        totalReview:1,
         fee: 1,
         experience: 1,
         serviceType: 1,
