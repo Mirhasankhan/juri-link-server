@@ -10,6 +10,7 @@ import { earningRoutes } from "../modules/earning/earning.route";
 import { reviewRoutes } from "../modules/review/review.route";
 import { adminRoutes } from "../modules/admin/admin.route";
 import { termPrivacyRoutes } from "../modules/terms&Policy/terms.policy.route";
+import { messageRoutes } from "../modules/message/message.route";
 
 const router = Router();
 const moduleRoutes = [
@@ -56,6 +57,10 @@ const moduleRoutes = [
   {
     path: "/term-privacy",
     route: termPrivacyRoutes,
+  },
+  {
+    path: "/message",
+    route: messageRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
