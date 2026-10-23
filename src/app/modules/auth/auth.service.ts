@@ -101,10 +101,21 @@ const verifyForgotPasswordOtpCode = async (payload: any) => {
   return { accessToken };
 };
 
-const resetPasswordIntoDB = async (newPassword: string, userId: string) => {
+const resetPasswordIntoDB = async (
+  newPassword: string,
+  userId: string,
+  oldPassword?: string
+) => {
   const existingUser = await User.findById(userId);
   if (!existingUser) {
     throw new AppError(404, "User not found");
+  }
+
+  if (oldPassword) {
+    const isMatched = await bcrypt.compare(oldPassword, existingUser.password);
+    if (!isMatched) {
+      throw new AppError(400, "Current password does not match");
+    }
   }
 
   const hashedPassword = await bcrypt.hash(

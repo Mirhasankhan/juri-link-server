@@ -37,14 +37,14 @@ const verifyOtp = catchAsync(async (req, res) => {
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  const { newPassword } = req.body;
+  const { newPassword, oldPassword } = req.body;
   const userId = req.user.id;
-  await authServices.resetPasswordIntoDB(newPassword, userId);
+  await authServices.resetPasswordIntoDB(newPassword, userId, oldPassword);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "password reset successfully",
+    message: "Password changed successfully",
   });
 });
 const updateUser = catchAsync(async (req, res) => {
