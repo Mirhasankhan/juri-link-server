@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: ["http://localhost:3000","https://api.passit.smtsigma.com", "http://72.60.10.234:3055","https://juri-link-dashboard.vercel.app"],
+    origin: ["http://localhost:3000", "https://juri-link-frontend.vercel.app", "https://api.passit.smtsigma.com", "http://72.60.10.234:3055", "https://juri-link-dashboard.vercel.app"],
     credentials: true,
   })
 );
