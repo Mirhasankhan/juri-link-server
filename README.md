@@ -94,9 +94,43 @@ STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
 - `npm run dev` - run server in development with auto-reload
 - `npm run build` - compile TypeScript to `dist/`
-- `npm run prod` - run compiled server (`dist/src/server.js`)
+- `npm run start` - run compiled production server (`dist/server.js`)
+- `npm run prod` - alias for production server (`dist/server.js`)
 - `npm run lint` - run ESLint
 - `npm run lint-fix` - auto-fix lint issues
+- `npm run docker:build` - build Docker image
+- `npm run docker:run` - run Docker container with local port 5000
+- `npm run docker:up` - start all services (API, MongoDB, Redis) via Docker Compose
+- `npm run docker:down` - stop all Docker Compose services
+
+## Running with Docker
+
+### 1. Using Docker Compose (Recommended)
+This starts the backend API together with MongoDB and Redis containers:
+
+```bash
+# Copy and configure environment variables
+cp .env.example .env
+
+# Start all containers in the background
+docker compose up -d --build
+
+# View container logs
+docker compose logs -f
+
+# Stop all containers
+docker compose down
+```
+
+### 2. Standalone Docker Container
+
+```bash
+# Build the Docker image
+docker build -t juri-link-backend .
+
+# Run container (loads your .env file)
+docker run -d -p 5000:5000 --name juri-link-backend --env-file .env juri-link-backend
+```
 
 ## Running Locally
 
